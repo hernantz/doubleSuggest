@@ -13,7 +13,7 @@
  */
  
 (function($){
-console.log('estoy en un branch');
+	console.log("branch");
 	$.fn.doubleSuggest = function(options) {
 		var defaults = {
 			source: {}, // Object or URL where doubleSuggest gets the suggestions from.
@@ -253,7 +253,6 @@ console.log('estoy en un branch');
 					var newText = spot.length > 0 ? spot.data('data')['attributes'][opts.selectedItemProp] : typedText;
 					$input.val(newText);
 				}
-				
 			}
 
 			// Bind the click event as a way to select results and bind also the mouseover effect on the results list.
