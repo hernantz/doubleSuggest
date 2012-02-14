@@ -13,7 +13,7 @@
  */
  
 (function($){
-
+alert('estoy en un branch');
 	$.fn.doubleSuggest = function(options) {
 		var defaults = {
 			source: {}, // Object or URL where doubleSuggest gets the suggestions from.
@@ -108,7 +108,7 @@
 			}
 			
 			// The user is typing on the input.
-			function onInputKeyDown(e) {console.log(e.keyCode)
+			function onInputKeyDown(e) {
 
 				// Track last key pressed.
 				lastKey = e.keyCode;
