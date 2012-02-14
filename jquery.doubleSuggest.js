@@ -13,7 +13,6 @@
  */
  
 (function($){
-	console.log("branch");
 	$.fn.doubleSuggest = function(options) {
 		var defaults = {
 			source: {}, // Object or URL where doubleSuggest gets the suggestions from.
