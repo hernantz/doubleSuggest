@@ -20,9 +20,9 @@
 			emptyText: 'No Results Found', // Text to display when their are no search results.
 			loadingText: 'Loading...', // Text to display when the results are being retrieved.
 			newItem: false, // If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
-			selectedItemProp: 'value', // Value displayed on the added item
+			selectedItemProp: 'name', // Value displayed on the added item
 			selectProp: 'value', // Name of object property added to the hidden input.
-			seekVal: 'value', // Comma separated list of object property names.
+			seekVal: 'name', // Comma separated list of object property names.
 			queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
 			queryLimit: false, // Number for 'limit' param on ajax request.
 			extraParams: '', // This will be added onto the end of the AJAX request URL. Make sure you add an '&' before each param.
@@ -252,7 +252,6 @@
 					var newText = spot.length > 0 ? spot.data('data')['attributes'][opts.selectedItemProp] : typedText;
 					$input.val(newText);
 				}
-				
 			}
 
 			// Bind the click event as a way to select results and bind also the mouseover effect on the results list.
@@ -309,8 +308,7 @@
 						  
 							// Build each result li element to show on the results list.
 							var resultLI = $('<li class="as-result-item" id="as-result-item-'+i+'"></li>').data('data',{attributes: data[i], num: i});
-
-							var thisData = $.extend({}, data[i]);
+							var resultData = $.extend({}, data[i]);
 
 							// Make the suggestions case sensitive or not. 
 							var cType = !opts.matchCase ? 'gi' : 'g';
@@ -318,11 +316,11 @@
 
 							// Highlight the results if the option is set to true.
 							if (opts.resultsHighlight) {
-								thisData[opts.selectedItemProp] = thisData[opts.selectedItemProp].replace(regx,"<em>$1</em>");
+								resultData[opts.selectedItemProp] = resultData[opts.selectedItemProp].replace(regx,"<em>$1</em>");
 							}
 
-							// Call the custom formatList event if it exists.
-							resultLI = !opts.formatList ? resultLI.html(thisData[opts.selectedItemProp]) : opts.formatList.call(this, thisData, resultLI);
+							// Call the custom formatList functions if it exists.
+							resultLI = !opts.formatList ? resultLI.html(resultData[opts.selectedItemProp]) : opts.formatList.call(this, resultData, matchCount, resultLI);
 
 							// Add the LI element to the results list.
 							$resultsUL.append(resultLI);
@@ -332,7 +330,6 @@
 
 							// Check if we reached the limit of results to show.
 							if (qLimit && qLimit == matchCount ){ break; }
-						
 						}
 						
 						i++;
