@@ -1,0 +1,13 @@
+ * gtSuggest
+ * Version 0.1 - Updated: JAN. 13, 2012
+ *
+ * This Plug-In will set up a UI that suggest results for your search queries as you type. 
+ * It will display two types of suggestions, first (and faster) the local data and also the results 
+ * from a remote search query. 
+ * It supports keybord navigation and multiple gtSuggest fields on the same page.
+ *
+ * Built on top of the jSuggest plugin by: hernantz | www.gotune.to
+ *
+ * This gtSuggest jQuery plug-in is dual licensed under the MIT and GPL licenses:
+ * http:// www.opensource.org/licenses/mit-license.php
+ * http:// www.gnu.org/licenses/gpl.html
