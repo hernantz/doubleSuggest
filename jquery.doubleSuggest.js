@@ -13,7 +13,7 @@
  */
  
 (function($){
-alert('estoy en un branch');
+console.log('estoy en un branch');
 	$.fn.doubleSuggest = function(options) {
 		var defaults = {
 			source: {}, // Object or URL where doubleSuggest gets the suggestions from.
@@ -255,6 +255,30 @@ alert('estoy en un branch');
 				}
 				
 			}
+
+			// Bind the click event as a way to select results and bind also the mouseover effect on the results list.
+			$resultsHolder.on({
+				click: function(e){
+					var rawData = $(this).data('data');
+					var number = rawData.i;
+					var data = rawData.attributes;
+					$input.val('').focus();
+
+					// Add the clicked result as a new item.
+					addItem(data, number);
+
+					// Call the custom resultClick event.
+					opts.resultClick.call(this, rawData);
+
+					// Hide the results list.
+					$resultsHolder.hide();
+				},
+				mouseover : function(e) {
+					// When the mouse is over a suggestion, spot it.
+					$('li', $resultsUL).removeClass('active');
+					$(this).addClass('active');
+				}
+			}, ".as-result-item");
 			
 			// Function used to get the data from the source and send it to the processData function.
 			// Function that gets the matched results and displays them.
@@ -284,26 +308,8 @@ alert('estoy en un branch');
 						// If the search returned at least one result, and that result is not already selected.
 						if (str.search(queryString) !== -1) {
 						  
-							// Build each result li element to show on the results list, and bind the click event as a way to select results.
-							var resultLI = $('<li class="as-result-item" id="as-result-item-'+i+'"></li>').click(function() {
-								var rawData = $(this).data('data');
-								var number = rawData.i;
-								var data = rawData.attributes;
-								$input.val('').focus();
-
-								// Add the clicked result as a new item.
-								addItem(data, number);
-
-								// Call the custom resultClick event.
-								opts.resultClick.call(this, rawData);
-
-								// Hide the results list.
-								$resultsHolder.hide();
-
-							}).mouseover(function() { // When the mouse is over a suggestion, spot it. 
-								$('li', $resultsUL).removeClass('active');
-								$(this).addClass('active');
-							}).data('data',{attributes: data[i], num: i});
+							// Build each result li element to show on the results list.
+							var resultLI = $('<li class="as-result-item" id="as-result-item-'+i+'"></li>').data('data',{attributes: data[i], num: i});
 
 							var thisData = $.extend({}, data[i]);
 
