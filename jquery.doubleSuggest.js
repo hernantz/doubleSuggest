@@ -1,6 +1,5 @@
 /*
- * doubleSuggest
- * Version 0.1 - Updated: JAN. 13, 2012
+ * doubleSuggest - Version 0.1
  *
  * This Plug-In will set up a UI that suggest results for your search queries as you type. 
  * It will display two types of suggestions, first (and faster) the local data and also the results 
@@ -11,7 +10,6 @@
  *
  * This doubleSuggest jQuery plug-in is licensed under MIT license:
  * http:// www.opensource.org/licenses/mit-license.php
- * http:// www.gnu.org/licenses/gpl.html
  */
  
 (function($){
@@ -51,67 +49,67 @@
 
 		return this.each(function(x) {
 		
-			// Get the text input and tune it up.
-			// Also get it's id so we can call this plugin multiple times.
-			var $input = $(this),
-				input_id = $input.attr('id');
+			// Grab the text input and it's id so we can call this plugin multiple times.
+			var $input = $(this);
+			var	input_id = $input.attr('id');
 			$input.attr('autocomplete', 'off').addClass('ds-input').val(opts.startText);
 			
-			// Setup basic elements and render them to the DOM.
-			$input.wrap('<div class="ds-container" id="ds-container-'+input_id+'"></div>');
+			// Global container of the selected items.
+			var $dsContainer = $('<div class="ds-container" id="ds-container-'+input_id+'"></div>');
+			$input.wrap($dsContainer);
 			
-			// UL that acts as a global container of the selected items.
-			var itemsHolder = $('#ds-container-'+input_id);
-			
-			// Div that holds each result or message inside the resultsUL. 
-			var resultsHolder = $('<div class="as-results" id="as-results-'+input_id+'"></div>').hide();
+			// Div that holds each result or message inside the $resultsUL. 
+			var $resultsHolder = $('<div class="as-results" id="as-results-'+input_id+'"></div>').hide();
+			$input.after($resultsHolder);
 			
 			// UL where all search results and messages are placed.
-			var resultsUL =  $('<ul class="as-list"></ul>').css('width', $input.outerWidth()).appendTo(resultsHolder);
-			
+			var $resultsUL = $('<ul class="as-list"></ul>').css('width', $input.outerWidth()).appendTo($resultsHolder);
+
 			// Used internally to know what text was typed by the user
 			var typedText = '';
 			
 			// Get the query limit value.
 			var qLimit = opts.queryLimit;
-			
-			// Flag variable activated when the results are showed up, to enable adding new items.
-			var resultsFlag = false;
-			
+
 			// Variable that will be holding the remaining time to process the input between each keyup event.
 			var timeout = null;
 
 			// Get an array of the properties which the user wants to search with.
 			var props = opts.seekVal.split(','); 
 			
-			// When the doubleSuggest container is clicked trigger the focus() event on the input.
-			itemsHolder.after(resultsHolder);
-
 			// Handle input field events.
-			$input.focus(function(){
+			$input.focus(onInputFocus).keydown(onInputKeyDown).blur(onInputBlur);
+
+			// When the input gains focus.
+			function onInputFocus(e) {
 			  
 				// Remove the startText if we click on the input. 
 				if ($input.val() === opts.startText) { $input.val(''); }
-				  
+				
 				// When the input is active, highlight the selections by removing the 'blur' class.
-				$("li.as-selection-item", itemsHolder).removeClass('blur');
+				$("li.as-selection-item", $dsContainer).removeClass('blur');
 				
 				// Show the results list if there is a value in the input.
-				if ($.trim($input.val()) !== ''){ resultsHolder.show(); }
+				if ($.trim($input.val()) !== '') { $resultsHolder.show(); }
 			  
-			}).blur(function() { // When we loose the focus.
+			}
+
+			// When the input looses the focus.
+			function onInputBlur(e) {
 			  
 				// If no selections where made, show startText again.
 				if ($input.val() === ''){ $input.val(opts.startText); }
 				
 				// If the user is no longer manipulating the results list, hide it.
-				if (!(resultsHolder.is(':hover'))){
-					$('li.as-selection-item', itemsHolder).addClass('blur').removeClass('selected');
-					resultsHolder.hide();
+				if (!($resultsHolder.is(':hover'))){
+					$('li.as-selection-item', $dsContainer).addClass('blur').removeClass('selected');
+					$resultsHolder.hide();
 				}
-			  
-			}).keydown(function(e) { // The user is typing on the input.
-			  
+			}
+			
+			// The user is typing on the input.
+			function onInputKeyDown(e) {console.log(e.keyCode)
+
 				// Track last key pressed.
 				lastKey = e.keyCode;
 				
@@ -128,7 +126,7 @@
 					case 8:
 
 						// Remove the last char from the input and hide the results list.
-						if ($input.val().length === 1){ resultsHolder.hide(); }
+						if ($input.val().length === 1){ $resultsHolder.hide(); }
 
 						// Make the search again, after the timeout delay.
 						if (timeout){ clearTimeout(timeout); }
@@ -146,76 +144,64 @@
 						if (nInput !== '' && nInput.length >= opts.minChars) { 
 							
 							// If the tab or return keys are pressed when an result item is active, add it.
-							if ((lastKey === 9 || lastKey === 13) && $('li.as-result-item:visible', resultsHolder).length > 0 && $('li.active:first', resultsUL).length > 0) { 
-								$('li.active:first', resultsUL).click();
+							if ((lastKey === 9 || lastKey === 13) && $('li.as-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) { 
+								$('li.active:first', $resultsUL).click();
 							
 							} else { // The tab or return keys where pressed when no results where found.
 								
 								// If adding new items is allowed.
 								if (opts.newItem) {
 
-									// Check that the results where loaded.
-									if (resultsFlag) {
-										resultsFlag = false;
+									// Get the custom formated object from the new item function.
+									var nData = opts.newItem.call(this, nInput);
 
-										// Get the custom formated object from the new item function.
-										var nData = opts.newItem.call(this, nInput);
+									// Generate a custom number identifier for the new item.
+									var lis = $('li', $dsContainer).length;
 
-										// Generate a custom number identifier for the new item.
-										var lis = $('li', itemsHolder).length;
+									// Add the new item.
+									addItem(nData, '00' + (lis+1));
 
-										// Add the new item.
-										addItem(nData, '00' + (lis+1));
+									// Hide the results list.
+									$resultsHolder.hide();
 
-										// Hide the results list.
-										resultsHolder.hide();
-
-										// Reset the text input.
-										$input.val('');
-
-									}
+									// Reset the text input.
+									$input.val('');
 								}
 							}
 						}	
 						break;
 
 					default:
+
 						// Other key was pressed, call the keyChange event after the timeout delay.
 						if (timeout) { clearTimeout(timeout); }
-						timeout = setTimeout(function(){ keyChange(); }, opts.keyDelay);
+						timeout = setTimeout(function(){ keyChange(lastKey); }, opts.keyDelay);
 						break;
 				}
-
-			}).keyup(function() {
-			
-			
-			});
+			}
 
 			// Function that is executed when typing and after the key delay timeout.
-			function keyChange() {
+			function keyChange(lastKey) {
 
 				// ignore if the following keys are pressed: [del] [shift] [capslock]
-				if ( lastKey == 46 || (lastKey > 9 && lastKey < 32) ){ return resultsHolder.hide(); }
+				if ( lastKey == 46 || (lastKey > 9 && lastKey < 32) ){ return $resultsHolder.hide(); }
 
 				// Get the text from the input.
 				// Remove the slashes (\ /) and then the extra whitespaces.
 				var string = $.trim($input.val()).replace(/[\\]+|[\/]+/g,"").replace(/\s+/g," ");
-				
+
 				// Save the string to know what was typed by the user.
 				typedText = string;
 
 				// If we passed the min chars limit, proceed.
 				if (string.length >= opts.minChars) {
 
-					// This counter is to get the number of values inside the source.
-					var dCount = 0;
-
 					// Call the custom beforeRetrieve function.
 					if (opts.beforeRetrieve){ string = opts.beforeRetrieve.call(this, string); }
 
 					// Show the loading text, and start the loading state.
 					$input.addClass('loading');
-					resultsUL.html('<li class="as-message">'+opts.loadingText+'</li>').show(); resultsHolder.show();
+					$resultsUL.html('<li class="as-message">'+opts.loadingText+'</li>').show(); $resultsHolder.show();
 
 					// If the data is a URL, retrieve the results from it. Else, the data is an object, retrieve the results directly from the source.
 					if (dType === 'string') {
@@ -231,36 +217,31 @@
 				} else {
 					// We don't have the min chars required. 
 					$input.removeClass('loading');
-					resultsHolder.hide();
+					$resultsHolder.hide();
 				}
 
 			}
-		  
+
+			// Call the custom selectionAdded function with the recently added item as elem and its associated data.		  
 			function addItem(data, num) {
-				
 				typedText = data[opts.selectedItemProp];
-				
-				var item = $('<li class="as-selection-item" id="as-selection-'+num+'"></li>');
-
-				// Call the custom selectionAdded function with the recently added item as elem and its associated data.
 				opts.selectionAdded.call(this, data);
-
 			}
 			
 			// Function that handles the up & down key press events to select the results.
 			function spotResult(dir, oldText) {
 
 				// If there is at least one visible item in the results list.
-				if ($('li.as-result-item:visible', resultsHolder).length > 0) {
+				if ($('li.as-result-item:visible', $resultsHolder).length > 0) {
 				
 					// Get all the LI elements from the results list.
-					var lis = $('li', resultsHolder);
+					var lis = $('li', $resultsHolder);
 
 					// If the direction is 'down' spot the first result. If it is 'up', spot the last result.
 					var spot = dir === 'down' ? lis.eq(0) : lis.filter(':last');
 
 					// If a LI element was already spoted, take it as the base for future movements.
-					var active = $('li.active:first', resultsHolder);
+					var active = $('li.active:first', $resultsHolder);
 					if (active.length > 0){ spot = dir === 'down' ? active.next() : active.prev(); }
 
 					// Set the 'active' class to the current result item.
@@ -282,9 +263,9 @@
 				var data = opts.retrieveComplete.call(this, data), // This variable will hold the object from the source to be processed. 
 					matchCount = 0,
 					i = 0;
-					
+
 				// Clean and hide the results container.				  
-				resultsHolder.html(resultsUL.html('')).hide();
+				$resultsHolder.html($resultsUL.html('')).hide();
 			  
 				// Loop the data to get an index of each element.
 				for (var k in data) {
@@ -317,10 +298,10 @@
 								opts.resultClick.call(this, rawData);
 
 								// Hide the results list.
-								resultsHolder.hide();
+								$resultsHolder.hide();
 
 							}).mouseover(function() { // When the mouse is over a suggestion, spot it. 
-								$('li', resultsUL).removeClass('active');
+								$('li', $resultsUL).removeClass('active');
 								$(this).addClass('active');
 							}).data('data',{attributes: data[i], num: i});
 
@@ -339,7 +320,7 @@
 							resultLI = !opts.formatList ? resultLI.html(thisData[opts.selectedItemProp]) : opts.formatList.call(this, thisData, resultLI);
 
 							// Add the LI element to the results list.
-							resultsUL.append(resultLI);
+							$resultsUL.append(resultLI);
 
 							// Increment the results counter after each result is added to the results list.
 							matchCount++;
@@ -355,15 +336,14 @@
 	  
 				// There results where processed, remove the loading state
 				$input.removeClass('loading');
-				resultsFlag = true;
 			
 				// If no results were found, show the empty text message.
 				if (matchCount <= 0){ 
-					resultsUL.html('<li class="as-message">'+opts.emptyText+'</li>'); 
+					$resultsUL.html('<li class="as-message">'+opts.emptyText+'</li>'); 
 				}
 
 				// Show the results list.
-				resultsHolder.show();
+				$resultsHolder.show();
 
 				// Call the custom resultsComplete function.
 				opts.resultsComplete.call(this);
