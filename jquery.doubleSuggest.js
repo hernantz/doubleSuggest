@@ -35,7 +35,6 @@
 			formatList: function (data, counter, elem) { return elem.html(data[opts.selectedItemProp]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
 			beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local objected is searched.
 			retrieveComplete: function(data, queryString){ return data; },
-			resultClick: function(data){}, // Custom function that is run when a search result item is clicked.
 			resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
 		}; 
 		
