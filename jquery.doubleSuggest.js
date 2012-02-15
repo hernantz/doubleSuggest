@@ -22,7 +22,6 @@
 			loadingText: 'Loading...', // Text to display when the results are being retrieved.
 			newItem: false, // If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
 			selectedItemProp: 'name', // Value displayed on the added item
-			selectProp: 'value', // Name of object property added to the hidden input.
 			seekVal: 'name', // Comma separated list of object property names.
 			queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
 			queryLimit: false, // Number for 'limit' param on ajax request.
@@ -137,37 +136,33 @@
 					// Tab or comma keys pressed.
 					case 9: case 188: case 13:
 					
-						// Prevent default behaviour if the comma or return keys are pressed to avoid submiting the form which doubleSuggest is part of.
-						e.preventDefault();
-
 						var nInput = $.trim($input.val()).replace(/(,)/g, '');
 						if (nInput !== '' && nInput.length >= opts.minChars) { 
 							
 							// If the tab or return keys are pressed when an result item is active, add it.
+							// Prevent default behaviour if the comma or return keys are pressed to avoid submiting the form which doubleSuggest is part of.
 							if ((lastKey === 9 || lastKey === 13) && $('li.as-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) { 
-								$('li.active:first', $resultsUL).click();
-							
-							} else { // The tab or return keys where pressed when no results where found.
+								e.preventDefault();
+								$('li.active:first', $resultsUL).trigger('select');
+							} 
+							// else { // The tab or return keys where pressed when no results where found.
 								
-								// If adding new items is allowed.
-								if (opts.newItem) {
+							// 	// If adding new items is allowed.
+							// 	if (opts.newItem) {
 
-									// Get the custom formated object from the new item function.
-									var nData = opts.newItem.call(this, nInput);
+							// 		// Get the custom formated object from the new item function.
+							// 		var nData = opts.newItem.call(this, nInput);
 
-									// Generate a custom number identifier for the new item.
-									var lis = $('li', $dsContainer).length;
+							// 		// Add the new item.
+							// 		addItem(nData);
 
-									// Add the new item.
-									addItem(nData, '00' + (lis+1));
+							// 		// Hide the results list.
+							// 		$resultsHolder.hide();
 
-									// Hide the results list.
-									$resultsHolder.hide();
-
-									// Reset the text input.
-									$input.val('');
-								}
-							}
+							// 		// Reset the text input.
+							// 		$input.val('');
+							// 	}
+							// }
 						}	
 						break;
 
@@ -221,12 +216,6 @@
 				}
 
 			}
-
-			// Call the custom selectionAdded function with the recently added item as elem and its associated data.		  
-			function addItem(data, num) {
-				typedText = data[opts.selectedItemProp];
-				opts.selectionAdded.call(this, data);
-			}
 			
 			// Function that handles the up & down key press events to select the results.
 			function spotResult(dir, oldText) {
@@ -258,24 +247,23 @@
 			// Bind the click event as a way to select results and bind also the mouseover effect on the results list.
 			$resultsHolder.on({
 				click: function(e){
-					var rawData = $(this).data('data');
-					var number = rawData.i;
-					var data = rawData.attributes;
-					$input.val('').focus();
-
-					// Add the clicked result as a new item.
-					addItem(data, number);
-
-					// Call the custom resultClick event.
-					opts.resultClick.call(this, rawData);
-
-					// Hide the results list.
-					$resultsHolder.hide();
+					$(this).trigger("select");
 				},
 				mouseover : function(e) {
 					// When the mouse is over a suggestion, spot it.
 					$('li', $resultsUL).removeClass('active');
 					$(this).addClass('active');
+				},
+				select: function(e) {
+
+					var data = $(this).data();
+					
+					typedText = data[opts.selectedItemProp];
+					opts.selectionAdded.call(this, data);
+
+					// Clear the input and hide the results list.
+					// $input.val('').focus();
+					$resultsHolder.hide();					
 				}
 			}, ".as-result-item");
 			
@@ -301,7 +289,7 @@
 						}
 					
 						// If not required, ignore the case sensitive search.
-						//if (!opts.matchCase) { str = str.toLowerCase(); queryString = queryString.toLowerCase(); }
+						if (!opts.matchCase) { str = str.toLowerCase(); queryString = queryString.toLowerCase(); }
 						
 						// If the search returned at least one result, and that result is not already selected.
 						if (str.search(queryString) !== -1) {
