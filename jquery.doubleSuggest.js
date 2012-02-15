@@ -1,9 +1,10 @@
 /*
  * doubleSuggest - Version 0.1
  *
- * This Plug-In will set up a UI that suggest results for your search queries as you type. 
- * It will display two types of suggestions, first (and faster) the local data and also the results 
- * from a remote search query. 
+ * This Plug-In will set up a UI that suggest results for your 
+ * search queries as you type. 
+ * It will display two types of suggestions, first (and faster) the local data 
+ * and also the results from a remote search query. 
  * It supports keybord navigation and multiple doubleSuggest fields on the same page.
  *
  * Built on top of the jSuggest plugin by: hernantz | www.gotune.to
@@ -20,20 +21,21 @@
 			emptyText: 'No Results Found', // Text to display when their are no search results.
 			loadingText: 'Loading...', // Text to display when the results are being retrieved.
 			newItem: false, // If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
-			selectProp: 'name', // Value displayed on the added item
+			selectedItemProp: 'name', // Value displayed on the added item
 			seekVal: 'name', // Comma separated list of object property names.
 			queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
 			queryLimit: false, // Number for 'limit' param on ajax request.
 			extraParams: '', // This will be added onto the end of the AJAX request URL. Make sure you add an '&' before each param.
-			matchCase: false, // Make the search case sensitive when set to true.
+			matchCase: true, // Make the search case sensitive when set to true.
 			minChars: 1, // Minimum number of characters that must be entered before the search begins.
 			keyDelay: 500, //  The delay after a keydown on the doubleSuggest input field and before search is started.
 			resultsHighlight: true, // Option to choose whether or not to highlight the matched text in each result item.
 			showResultList: true, // If set to false, the Results Dropdown List will never be shown at any time.
 			selectionAdded: function(data){}, // Custom function that is run when an item is added to the items holder.
-			formatList: false, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
+			formatList: function (data, counter, elem) { return elem.html(data[opts.selectedItemProp]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
 			beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local objected is searched.
-			retrieveComplete: function(data){ return data; },
+			retrieveComplete: function(data, queryString){ return data; },
+			resultClick: function(data){}, // Custom function that is run when a search result item is clicked.
 			resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
 		}; 
 		
@@ -133,36 +135,34 @@
 
 					// Tab or comma keys pressed.
 					case 9: case 188: case 13:
-
+					
 						var nInput = $.trim($input.val()).replace(/(,)/g, '');
 						if (nInput !== '' && nInput.length >= opts.minChars) { 
 							
 							// If the tab or return keys are pressed when an result item is active, add it.
 							// Prevent default behaviour if the comma or return keys are pressed to avoid submiting the form which doubleSuggest is part of.
 							if ((lastKey === 9 || lastKey === 13) && $('li.as-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) { 
-								$('li.active:first', $resultsUL).trigger("click");
 								e.preventDefault();
-							} else { // The tab or return keys where pressed when no results where found.
+								$('li.active:first', $resultsUL).trigger('select');
+							} 
+							// else { // The tab or return keys where pressed when no results where found.
 								
-								// If adding new items is allowed.
-								if (opts.newItem) {
+							// 	// If adding new items is allowed.
+							// 	if (opts.newItem) {
 
-									// Get the custom formated object from the new item function.
-									var nData = opts.newItem.call(this, nInput);
+							// 		// Get the custom formated object from the new item function.
+							// 		var nData = opts.newItem.call(this, nInput);
 
-									// Generate a custom number identifier for the new item.
-									var lis = $('li', $dsContainer).length;
+							// 		// Add the new item.
+							// 		addItem(nData);
 
-									// Add the new item.
-									addItem(nData, '00' + (lis+1));
+							// 		// Hide the results list.
+							// 		$resultsHolder.hide();
 
-									// Hide the results list.
-									$resultsHolder.hide();
-
-									// Reset the text input.
-									$input.val('');
-								}
-							}
+							// 		// Reset the text input.
+							// 		$input.val('');
+							// 	}
+							// }
 						}	
 						break;
 
@@ -216,12 +216,6 @@
 				}
 
 			}
-
-			// Call the custom selectionAdded function with the recently added item as elem and its associated data.		  
-			function addItem(data, num) {
-				typedText = data[opts.selectProp];
-				opts.selectionAdded.call(this, data);
-			}
 			
 			// Function that handles the up & down key press events to select the results.
 			function spotResult(dir, oldText) {
@@ -245,7 +239,7 @@
 					
 					// Update the text with the currently selected item
 					// Display the text typed by the user if no result is selected
-					var newText = spot.length > 0 ? spot.data('data')['attributes'][opts.selectProp] : typedText;
+					var newText = spot.length > 0 ? spot.data('data')['attributes'][opts.selectedItemProp] : typedText;
 					$input.val(newText);
 				}
 			}
@@ -253,29 +247,30 @@
 			// Bind the click event as a way to select results and bind also the mouseover effect on the results list.
 			$resultsHolder.on({
 				click: function(e){
-					var rawData = $(this).data('data');
-					var number = rawData.i;
-					var data = rawData.attributes;
-					$input.val('').focus();
-
-					// Add the clicked result as a new item.
-					addItem(data, number);
-
-					// Hide the results list.
-					$resultsHolder.hide();
+					$(this).trigger("select");
 				},
 				mouseover : function(e) {
 					// When the mouse is over a suggestion, spot it.
 					$('li', $resultsUL).removeClass('active');
 					$(this).addClass('active');
+				},
+				select: function(e) {
+
+					var data = $(this).data();
+					
+					typedText = data[opts.selectedItemProp];
+					opts.selectionAdded.call(this, data);
+
+					// Clear the input and hide the results list.
+					// $input.val('').focus();
+					$resultsHolder.hide();					
 				}
 			}, ".as-result-item");
 			
-			// Function used to get the data from the source and send it to the processData function.
 			// Function that gets the matched results and displays them.
 			function processData (data, queryString) {
 				
-				var data = opts.retrieveComplete.call(this, data), // This variable will hold the object from the source to be processed. 
+				var data = opts.retrieveComplete.call(this, data, queryString), // This variable will hold the object from the source to be processed. 
 					matchCount = 0,
 					i = 0;
 
@@ -306,17 +301,14 @@
 							// Make the suggestions case sensitive or not. 
 							var cType = !opts.matchCase ? 'gi' : 'g';
 							var regx = new RegExp('(?![^&;]+;)(?!<[^<>]*)(' + queryString + ')(?![^<>]*>)(?![^&;]+;)', ''+ cType + '');
-
+							
 							// Highlight the results if the option is set to true.
 							if (opts.resultsHighlight) {
-								resultData[opts.selectProp] = resultData[opts.selectProp].replace(regx,"<em>$1</em>");
+								resultData[opts.selectedItemProp] = resultData[opts.selectedItemProp].replace(regx,"<em>$1</em>");
 							}
 
-							// Call the custom formatList functions if it exists.
-							resultLI = !opts.formatList ? resultLI.html(resultData[opts.selectProp]) : opts.formatList.call(this, resultData, matchCount, resultLI);
-
-							// Add the LI element to the results list.
-							$resultsUL.append(resultLI);
+							// Call the formatList function and add the LI element to the results list.
+							$resultsUL.append(opts.formatList.call(this, resultData, matchCount, resultLI));
 
 							// Increment the results counter after each result is added to the results list.
 							matchCount++;
