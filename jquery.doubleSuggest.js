@@ -1,9 +1,10 @@
 /*
  * doubleSuggest - Version 0.1
  *
- * This Plug-In will set up a UI that suggest results for your search queries as you type. 
- * It will display two types of suggestions, first (and faster) the local data and also the results 
- * from a remote search query. 
+ * This Plug-In will set up a UI that suggest results for your 
+ * search queries as you type. 
+ * It will display two types of suggestions, first (and faster) the local data 
+ * and also the results from a remote search query. 
  * It supports keybord navigation and multiple doubleSuggest fields on the same page.
  *
  * Built on top of the jSuggest plugin by: hernantz | www.gotune.to
@@ -26,15 +27,15 @@
 			queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
 			queryLimit: false, // Number for 'limit' param on ajax request.
 			extraParams: '', // This will be added onto the end of the AJAX request URL. Make sure you add an '&' before each param.
-			matchCase: false, // Make the search case sensitive when set to true.
+			matchCase: true, // Make the search case sensitive when set to true.
 			minChars: 1, // Minimum number of characters that must be entered before the search begins.
 			keyDelay: 500, //  The delay after a keydown on the doubleSuggest input field and before search is started.
 			resultsHighlight: true, // Option to choose whether or not to highlight the matched text in each result item.
 			showResultList: true, // If set to false, the Results Dropdown List will never be shown at any time.
 			selectionAdded: function(data){}, // Custom function that is run when an item is added to the items holder.
-			formatList: false, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
+			formatList: function (data, counter, elem) { return elem.html(data[opts.selectedItemProp]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
 			beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local objected is searched.
-			retrieveComplete: function(data){ return data; },
+			retrieveComplete: function(data, queryString){ return data; },
 			resultClick: function(data){}, // Custom function that is run when a search result item is clicked.
 			resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
 		}; 
@@ -278,11 +279,10 @@
 				}
 			}, ".as-result-item");
 			
-			// Function used to get the data from the source and send it to the processData function.
 			// Function that gets the matched results and displays them.
 			function processData (data, queryString) {
 				
-				var data = opts.retrieveComplete.call(this, data), // This variable will hold the object from the source to be processed. 
+				var data = opts.retrieveComplete.call(this, data, queryString), // This variable will hold the object from the source to be processed. 
 					matchCount = 0,
 					i = 0;
 
@@ -301,7 +301,7 @@
 						}
 					
 						// If not required, ignore the case sensitive search.
-						if (!opts.matchCase) { str = str.toLowerCase(); queryString = queryString.toLowerCase(); }
+						//if (!opts.matchCase) { str = str.toLowerCase(); queryString = queryString.toLowerCase(); }
 						
 						// If the search returned at least one result, and that result is not already selected.
 						if (str.search(queryString) !== -1) {
@@ -313,17 +313,14 @@
 							// Make the suggestions case sensitive or not. 
 							var cType = !opts.matchCase ? 'gi' : 'g';
 							var regx = new RegExp('(?![^&;]+;)(?!<[^<>]*)(' + queryString + ')(?![^<>]*>)(?![^&;]+;)', ''+ cType + '');
-
+							
 							// Highlight the results if the option is set to true.
 							if (opts.resultsHighlight) {
 								resultData[opts.selectedItemProp] = resultData[opts.selectedItemProp].replace(regx,"<em>$1</em>");
 							}
 
-							// Call the custom formatList functions if it exists.
-							resultLI = !opts.formatList ? resultLI.html(resultData[opts.selectedItemProp]) : opts.formatList.call(this, resultData, matchCount, resultLI);
-
-							// Add the LI element to the results list.
-							$resultsUL.append(resultLI);
+							// Call the formatList function and add the LI element to the results list.
+							$resultsUL.append(opts.formatList.call(this, resultData, matchCount, resultLI));
 
 							// Increment the results counter after each result is added to the results list.
 							matchCount++;
