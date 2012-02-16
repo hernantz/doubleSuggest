@@ -16,7 +16,8 @@
 (function($){
 	$.fn.doubleSuggest = function(options) {
 		var defaults = {
-			source: {}, // Object or URL where doubleSuggest gets the suggestions from.
+			localSource: {}, // Object where doubleSuggest gets the suggestions from.
+			remoteSource: false, // URL where doubleSuggest gets the suggestions from.
 			startText: 'Search', // Text to display when the doubleSuggest input field is empty.
 			emptyText: false, // Text to display when their are no search results.
 			loadingText: 'Loading...', // Text to display when the results are being retrieved.
@@ -41,10 +42,6 @@
 		// Merge the options passed with the defaults.
 		var opts = $.extend(defaults, options);     
 		
-		// Get the data type of the source.
-		// Ensure that the source is either an object or a string.
-		var dType = typeof opts.source;
-
 		return this.each(function(x) {
 		
 			// Grab the text input and it's id so we can call this plugin multiple times.
@@ -76,103 +73,98 @@
 			var props = opts.seekVal.split(','); 
 			
 			// Handle input field events.
-			$input.focus(onInputFocus).keydown(onInputKeyDown).blur(onInputBlur);
-
-			// When the input gains focus.
-			function onInputFocus(e) {
-			  
-				// Remove the startText if we click on the input. 
-				if ($input.val() === opts.startText) { $input.val(''); }
-				
-				// When the input is active, highlight the selections by removing the 'blur' class.
-				$("li.as-selection-item", $dsContainer).removeClass('blur');
-				
-				// Show the results list if there is a value in the input.
-				if ($.trim($input.val()) !== '') { $resultsHolder.show(); }
-			  
-			}
-
-			// When the input looses the focus.
-			function onInputBlur(e) {
-			  
-				// If no selections where made, show startText again.
-				if ($input.val() === ''){ $input.val(opts.startText); }
-				
-				// If the user is no longer manipulating the results list, hide it.
-				if (!($resultsHolder.is(':hover'))){
-					$('li.as-selection-item', $dsContainer).addClass('blur').removeClass('selected');
-					$resultsHolder.hide();
-				}
-			}
-			
-			// The user is typing on the input.
-			function onInputKeyDown(e) {
-
-				// Track last key pressed.
-				lastKey = e.keyCode;
-				
-				switch(lastKey) {
+			// $input.focus(onInputFocus).keydown(onInputKeyDown).blur(onInputBlur);
+			$input.on({
+				"focus": function(e) {
+					// Remove the startText if we click on the input. 
+					if ($input.val() === opts.startText) { $input.val(''); }
 					
-					// Up & Down arrow keys pressed.
-					case 38: case 40:
-
-						e.preventDefault();
-						if (lastKey === 38) spotResult('up'); else spotResult('down');
-						break;
-
-					// Delete key pressed.
-					case 8:
-
-						// Remove the last char from the input and hide the results list.
-						if ($input.val().length === 1){ $resultsHolder.hide(); }
-
-						// Make the search again, after the timeout delay.
-						if (timeout){ clearTimeout(timeout); }
-						timeout = setTimeout(function(){ keyChange(); }, opts.keyDelay);
-
-						break;
-
-					// Tab or comma keys pressed.
-					case 9: case 188: case 13:
+					// When the input is active, highlight the selections by removing the 'blur' class.
+					$("li.as-selection-item", $dsContainer).removeClass('blur');
 					
-						var nInput = $.trim($input.val()).replace(/(,)/g, '');
-						if (nInput !== '' && nInput.length >= opts.minChars) { 
-							
-							// If the tab or return keys are pressed when an result item is active, add it.
-							// Prevent default behaviour if the comma or return keys are pressed to avoid submiting the form which doubleSuggest is part of.
-							if ((lastKey === 9 || lastKey === 13) && $('li.as-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) { 
-								$('li.active:first', $resultsUL).trigger('select');
-								e.preventDefault();
-							} 
-							// else { // The tab or return keys where pressed when no results where found.
+					// Show the results list if there is a value in the input.
+					if ($.trim($input.val()) !== '') { $resultsHolder.show(); }	
+				},
+				"keydown": function(e) {
+
+					// Track last key pressed.
+					lastKey = e.keyCode;
+					
+					switch(lastKey) {
+						
+						// Up & Down arrow keys pressed.
+						case 38: case 40:
+
+							e.preventDefault();
+							if (lastKey === 38) spotResult('up'); else spotResult('down');
+							break;
+
+						// Delete key pressed.
+						case 8:
+
+							// Remove the last char from the input and hide the results list.
+							if ($input.val().length === 1){ $resultsHolder.hide(); }
+
+							// Make the search again, after the timeout delay.
+							if (timeout){ clearTimeout(timeout); }
+							timeout = setTimeout(function(){ keyChange(); }, opts.keyDelay);
+
+							break;
+
+						// Tab or comma keys pressed.
+						case 9: case 188: case 13:
+						
+							var nInput = $.trim($input.val()).replace(/(,)/g, '');
+							if (nInput !== '' && nInput.length >= opts.minChars) { 
 								
-							// 	// If adding new items is allowed.
-							// 	if (opts.newItem) {
+								// If the tab or return keys are pressed when an result item is active, add it.
+								// Prevent default behaviour if the comma or return keys are pressed to avoid submiting the form which doubleSuggest is part of.
+								if ((lastKey === 9 || lastKey === 13) && $('li.as-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) { 
+									$('li.active:first', $resultsUL).trigger('select');
+									e.preventDefault();
+								} 
+								// else { // The tab or return keys where pressed when no results where found.
+									
+								// 	// If adding new items is allowed.
+								// 	if (opts.newItem) {
 
-							// 		// Get the custom formated object from the new item function.
-							// 		var nData = opts.newItem.call(this, nInput);
+								// 		// Get the custom formated object from the new item function.
+								// 		var nData = opts.newItem.call(this, nInput);
 
-							// 		// Add the new item.
-							// 		addItem(nData);
+								// 		// Add the new item.
+								// 		addItem(nData);
 
-							// 		// Hide the results list.
-							// 		$resultsHolder.hide();
+								// 		// Hide the results list.
+								// 		$resultsHolder.hide();
 
-							// 		// Reset the text input.
-							// 		$input.val('');
-							// 	}
-							// }
-						}	
-						break;
+								// 		// Reset the text input.
+								// 		$input.val('');
+								// 	}
+								// }
+							}	
+							break;
 
-					default:
+						default:
 
-						// Other key was pressed, call the keyChange event after the timeout delay.
-						if (timeout) { clearTimeout(timeout); }
-						timeout = setTimeout(function(){ keyChange(lastKey); }, opts.keyDelay);
-						break;
+							// Other key was pressed, call the keyChange event after the timeout delay.
+							if (timeout) { clearTimeout(timeout); }
+							timeout = setTimeout(function(){ keyChange(lastKey); }, opts.keyDelay);
+							break;
+					}
+				},
+				"blur": function(e) {
+				
+					// If no selections where made, show startText again.
+					if ($input.val() === ''){ $input.val(opts.startText); }
+					
+					// If the user is no longer manipulating the results list, hide it.
+					if (!($resultsHolder.is(':hover'))){
+						$('li.as-selection-item', $dsContainer).addClass('blur').removeClass('selected');
+						$resultsHolder.hide();
+					}
+					
 				}
-			}
+			});
 
 			// Function that is executed when typing and after the key delay timeout.
 			function keyChange(lastKey) {
@@ -198,17 +190,14 @@
 					if(opts.loadingText) { $resultsUL.html('<li class="as-message">'+opts.loadingText+'</li>').show(); }
 					$resultsHolder.show();
 
-					// If the data is a URL, retrieve the results from it. Else, the data is an object, retrieve the results directly from the source.
-					if (dType === 'string') {
-
-					  	// Set up the limit of the query.
-					  	var limit = qLimit ? "&limit="+encodeURIComponent(qLimit) : '';
-
-						// Build the query and retrieve the response in JSON format.
-						$.getJSON(opts.source+"?"+opts.queryParam+"="+encodeURIComponent(string)+limit+opts.extraParams, function(response) { processData(response, string); });
-
-					} else {
-						processData(opts.source, string); 
+					// If the data is a URL, build the query and retrieve the response in JSON format.
+					if (opts.remoteSource !== '') {
+						$.getJSON(opts.remoteSource+"?"+opts.queryParam+"="+encodeURIComponent(string)+opts.extraParams, function(response) { processData(response, string); });
+					}
+					
+					// If the local source is an object, retrieve the results directly from the source.
+					if(opts.localSource) {
+						processData(opts.localSource, string); 
 					}
 
 				} else {
@@ -220,7 +209,7 @@
 			}
 			
 			// Function that handles the up & down key press events to select the results.
-			function spotResult(dir, oldText) {
+			function spotResult(dir) {
 
 				// If there is at least one visible item in the results list.
 				if ($('li.as-result-item:visible', $resultsHolder).length > 0) {
@@ -267,6 +256,7 @@
 					// $input.val('').focus();
 					$resultsHolder.hide();					
 				}
+
 			}, ".as-result-item");
 			
 			// Function that gets the matched results and displays them.
