@@ -192,12 +192,12 @@
 
 					// If the data is a URL, build the query and retrieve the response in JSON format.
 					if (opts.remoteSource !== '') {
-						$.getJSON(opts.remoteSource+"?"+opts.queryParam+"="+encodeURIComponent(string)+opts.extraParams, function(response) { processData(response, string); });
+						$.getJSON(opts.remoteSource+"?"+opts.queryParam+"="+encodeURIComponent(string)+opts.extraParams, function(response) { processData(response, string, false); });
 					}
 					
 					// If the local source is an object, retrieve the results directly from the source.
 					if(opts.localSource) {
-						processData(opts.localSource, string); 
+						processData(opts.localSource, string, true); 
 					}
 
 				} else {
@@ -230,7 +230,7 @@
 					
 					// Update the text with the currently selected item
 					// Display the text typed by the user if no result is selected
-					var newText = spot.length > 0 ? spot.data('data')['attributes'][opts.selectedItemProp] : typedText;
+					var newText = spot.length > 0 ? spot.data()[opts.selectedItemProp] : typedText;
 					$input.val(newText);
 				}
 			}
@@ -256,24 +256,28 @@
 					// $input.val('').focus();
 					$resultsHolder.hide();					
 				}
-
 			}, ".as-result-item");
 			
 			// Function that gets the matched results and displays them.
-			function processData (data, queryString) {
+			function processData (data, queryString, local) {
 				
 				var data = opts.retrieveComplete.call(this, data, queryString), // This variable will hold the object from the source to be processed. 
 					matchCount = 0,
 					i = 0;
 
-				// Clean and hide the results container.				  
-				$resultsUL.html('');
-				$resultsHolder.hide();
-			  
+				if (local) {
+					// Clean and hide the results container.				  
+					$resultsUL.html('');
+					$resultsHolder.hide();
+				} 
+
 				// Loop the data to get an index of each element.
 				for (var k in data) {
 
 					if (data.hasOwnProperty(k)) {
+
+						// Set a flag for each data
+						data[i]['_dataSource'] = local ? 'local' : 'remote';
 
 						// Build a string for each element, by getting the data of all the properties in seekVal
 						str = '';
@@ -288,7 +292,7 @@
 						if (str.search(queryString) !== -1) {
 						  
 							// Build each result li element to show on the results list.
-							var resultLI = $('<li class="as-result-item" id="as-result-item-'+i+'"></li>').data('data',{attributes: data[i], num: i});
+							var resultLI = $('<li class="as-result-item" id="as-result-item-'+i+'"></li>').data(data[i]);
 							var resultData = $.extend({}, data[i]);
 
 							// Make the suggestions case sensitive or not. 
