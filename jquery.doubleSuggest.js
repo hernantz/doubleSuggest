@@ -18,7 +18,7 @@
 		var defaults = {
 			source: {}, // Object or URL where doubleSuggest gets the suggestions from.
 			startText: 'Search', // Text to display when the doubleSuggest input field is empty.
-			emptyText: 'No Results Found', // Text to display when their are no search results.
+			emptyText: false, // Text to display when their are no search results.
 			loadingText: 'Loading...', // Text to display when the results are being retrieved.
 			newItem: false, // If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
 			selectedItemProp: 'name', // Value displayed on the added item
@@ -26,12 +26,12 @@
 			queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
 			queryLimit: false, // Number for 'limit' param on ajax request.
 			extraParams: '', // This will be added onto the end of the AJAX request URL. Make sure you add an '&' before each param.
-			matchCase: true, // Make the search case sensitive when set to true.
+			matchCase: false, // Make the search case sensitive when set to true.
 			minChars: 1, // Minimum number of characters that must be entered before the search begins.
 			keyDelay: 500, //  The delay after a keydown on the doubleSuggest input field and before search is started.
 			resultsHighlight: true, // Option to choose whether or not to highlight the matched text in each result item.
 			showResultList: true, // If set to false, the Results Dropdown List will never be shown at any time.
-			selectionAdded: function(data){}, // Custom function that is run when an item is added to the items holder.
+			onSelect: function(data){}, // Custom function that is run when an item is added to the items holder.
 			formatList: function (data, counter, elem) { return elem.html(data[opts.selectedItemProp]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
 			beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local objected is searched.
 			retrieveComplete: function(data, queryString){ return data; },
@@ -141,8 +141,8 @@
 							// If the tab or return keys are pressed when an result item is active, add it.
 							// Prevent default behaviour if the comma or return keys are pressed to avoid submiting the form which doubleSuggest is part of.
 							if ((lastKey === 9 || lastKey === 13) && $('li.as-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) { 
-								e.preventDefault();
 								$('li.active:first', $resultsUL).trigger('select');
+								e.preventDefault();
 							} 
 							// else { // The tab or return keys where pressed when no results where found.
 								
@@ -195,22 +195,25 @@
 
 					// Show the loading text, and start the loading state.
 					$input.addClass('loading');
-					$resultsUL.html('<li class="as-message">'+opts.loadingText+'</li>').show(); $resultsHolder.show();
+					if(opts.loadingText) { $resultsUL.html('<li class="as-message">'+opts.loadingText+'</li>').show(); }
+					$resultsHolder.show();
 
 					// If the data is a URL, retrieve the results from it. Else, the data is an object, retrieve the results directly from the source.
 					if (dType === 'string') {
 
-					  // Set up the limit of the query.
-					  var limit = qLimit ? "&limit="+encodeURIComponent(qLimit) : '';
+					  	// Set up the limit of the query.
+					  	var limit = qLimit ? "&limit="+encodeURIComponent(qLimit) : '';
 
 						// Build the query and retrieve the response in JSON format.
-						$.getJSON(opts.source+"?"+opts.queryParam+"="+encodeURIComponent(string)+limit+opts.extraParams, function(rData) { processData(rData, string); });
+						$.getJSON(opts.source+"?"+opts.queryParam+"="+encodeURIComponent(string)+limit+opts.extraParams, function(response) { processData(response, string); });
 
-					} else { processData(opts.source, string); }
+					} else {
+						processData(opts.source, string); 
+					}
 
 				} else {
 					// We don't have the min chars required. 
-					$input.removeClass('loading');
+					//$input.removeClass('loading');
 					$resultsHolder.hide();
 				}
 
@@ -258,9 +261,9 @@
 					var data = $(this).data();
 					
 					typedText = data[opts.selectedItemProp];
-					opts.selectionAdded.call(this, data);
+					opts.onSelect.call(this, data);
 
-					// Clear the input and hide the results list.
+					// Clear the input? and hide the results list.
 					// $input.val('').focus();
 					$resultsHolder.hide();					
 				}
@@ -274,7 +277,8 @@
 					i = 0;
 
 				// Clean and hide the results container.				  
-				$resultsHolder.html($resultsUL.html('')).hide();
+				$resultsUL.html('');
+				$resultsHolder.hide();
 			  
 				// Loop the data to get an index of each element.
 				for (var k in data) {
@@ -324,7 +328,7 @@
 				$input.removeClass('loading');
 			
 				// If no results were found, show the empty text message.
-				if (matchCount <= 0){ 
+				if (matchCount <= 0 && opts.emptyText){ 
 					$resultsUL.html('<li class="as-message">'+opts.emptyText+'</li>'); 
 				}
 
