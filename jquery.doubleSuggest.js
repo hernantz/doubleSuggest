@@ -13,32 +13,12 @@
  */
  
 (function($){
+
 	$.fn.doubleSuggest = function(options) {
 		
 		// Merge the options passed with the defaults.
-		var opts = $.extend({
-			localSource: {}, // Object where doubleSuggest gets the suggestions from.
-			remoteSource: false, // URL where doubleSuggest gets the suggestions from.
-			startText: 'Search', // Text to display when the doubleSuggest input field is empty.
-			emptyText: false, // Text to display when their are no search results.
-			loadingText: 'Loading...', // Text to display when the results are being retrieved.
-			newItem: false, // If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
-			selectedItemProp: 'name', // Value displayed on the added item
-			seekVal: 'name', // Comma separated list of object property names.
-			queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
-			queryLimit: false, // Number for 'limit' param on ajax request.
-			extraParams: '', // This will be added onto the end of the AJAX request URL. Make sure you add an '&' before each param.
-			matchCase: false, // Make the search case sensitive when set to true.
-			minChars: 1, // Minimum number of characters that must be entered before the search begins.
-			keyDelay: 500, //  The delay after a keydown on the doubleSuggest input field and before search is started.
-			resultsHighlight: true, // Option to choose whether or not to highlight the matched text in each result item.
-			onSelect: function(data){}, // Custom function that is run when an item is added to the items holder.
-			formatList: function (data, counter, elem) { return elem.html(data[opts.selectedItemProp]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
-			beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local objected is searched.
-			retrieveComplete: function(data, queryString){ return data; },
-			resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
-		}, options); 
-		
+		var opts = $.extend($.fn.doubleSuggest.defaults, options);
+
 		// Iterate over the current set of matched elements.
 		return this.each(function(x) {
 		
@@ -252,6 +232,8 @@
 					var data = $(this).data();
 					
 					typedText = data[opts.selectedItemProp];
+					$input.val(typedText).focus();
+					
 					opts.onSelect.call(this, data);
 
 					// Clear the input? and hide the results list.
@@ -336,4 +318,28 @@
 			}
 		});
 	};
+
+	// Make the defaults globally accessable.
+	$.fn.doubleSuggest.defaults = {
+		localSource: {}, // Object where doubleSuggest gets the suggestions from.
+		remoteSource: false, // URL where doubleSuggest gets the suggestions from.
+		startText: 'Search', // Text to display when the doubleSuggest input field is empty.
+		emptyText: false, // Text to display when their are no search results.
+		loadingText: 'Loading...', // Text to display when the results are being retrieved.
+		newItem: false, // If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
+		selectedItemProp: 'name', // Value displayed on the added item
+		seekVal: 'name', // Comma separated list of object property names.
+		queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
+		queryLimit: false, // Number for 'limit' param on ajax request.
+		extraParams: '', // This will be added onto the end of the AJAX request URL. Make sure you add an '&' before each param.
+		matchCase: false, // Make the search case sensitive when set to true.
+		minChars: 1, // Minimum number of characters that must be entered before the search begins.
+		keyDelay: 500, //  The delay after a keydown on the doubleSuggest input field and before search is started.
+		resultsHighlight: true, // Option to choose whether or not to highlight the matched text in each result item.
+		onSelect: function(data){}, // Custom function that is run when an item is added to the items holder.
+		formatList: function (data, counter, elem) { return elem.html(data[opts.selectedItemProp]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
+		beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local objected is searched.
+		retrieveComplete: function(data, queryString){ return data; },
+		resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
+	}
 })(jQuery);

@@ -1,11 +1,12 @@
- * doubleSuggest - Version 0.1
- *
- * This Plug-In will set up a UI that suggest results for your search queries as you type. 
- * It will display two types of suggestions, first (and faster) the local data and also the results 
- * from a remote search query. 
- * It supports keybord navigation and multiple doubleSuggest fields on the same page.
- *
- * Built on top of the jSuggest plugin by: hernantz | www.gotune.to
- *
- * This doubleSuggest jQuery plug-in is dual licensed under the MIT license:
- * http:// www.opensource.org/licenses/mit-license.php
+
+doubleSuggest
+
+@Version: 0.1
+@Author: hernantz 
+@Url: http://www.github.to/hernantz/doubleSuggest
+@License: MIT - http://www.opensource.org/licenses/mit-license.php
+
+This jQuery plugin will set up a UI that suggest results as you type. 
+It will display two types of suggestions, first (and faster) the local data 
+and also the results from an ajax search query. 
+Requires jQuery >= v.1.7
