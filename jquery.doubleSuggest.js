@@ -1,21 +1,22 @@
 /*
- * doubleSuggest - Version 0.1
+ * doubleSuggest
  *
- * This Plug-In will set up a UI that suggest results for your 
- * search queries as you type. 
+ * @Version: 0.1
+ * @Author: hernantz 
+ * @Url: http://www.github.to/hernantz/doubleSuggest
+ * @License: MIT - http://www.opensource.org/licenses/mit-license.php
+ *
+ * This jQuery plugin will set up a UI that suggest results as you type. 
  * It will display two types of suggestions, first (and faster) the local data 
- * and also the results from a remote search query. 
- * It supports keybord navigation and multiple doubleSuggest fields on the same page.
- *
- * Built on top of the jSuggest plugin by: hernantz | www.gotune.to
- *
- * This doubleSuggest jQuery plug-in is licensed under MIT license:
- * http:// www.opensource.org/licenses/mit-license.php
+ * and also the results from an ajax search query. 
+ * Requires jQuery > v.1.7
  */
  
 (function($){
 	$.fn.doubleSuggest = function(options) {
-		var defaults = {
+		
+		// Merge the options passed with the defaults.
+		var opts = $.extend({
 			localSource: {}, // Object where doubleSuggest gets the suggestions from.
 			remoteSource: false, // URL where doubleSuggest gets the suggestions from.
 			startText: 'Search', // Text to display when the doubleSuggest input field is empty.
@@ -31,17 +32,14 @@
 			minChars: 1, // Minimum number of characters that must be entered before the search begins.
 			keyDelay: 500, //  The delay after a keydown on the doubleSuggest input field and before search is started.
 			resultsHighlight: true, // Option to choose whether or not to highlight the matched text in each result item.
-			showResultList: true, // If set to false, the Results Dropdown List will never be shown at any time.
 			onSelect: function(data){}, // Custom function that is run when an item is added to the items holder.
 			formatList: function (data, counter, elem) { return elem.html(data[opts.selectedItemProp]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
 			beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local objected is searched.
 			retrieveComplete: function(data, queryString){ return data; },
 			resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
-		}; 
+		}, options); 
 		
-		// Merge the options passed with the defaults.
-		var opts = $.extend(defaults, options);     
-		
+		// Iterate over the current set of matched elements.
 		return this.each(function(x) {
 		
 			// Grab the text input and it's id so we can call this plugin multiple times.
@@ -68,6 +66,9 @@
 
 			// Variable that will be holding the remaining time to process the input between each keyup event.
 			var timeout = null;
+
+			// Variable that holds the XMLHTTPRequest object. 
+			var jqxhr = null;
 
 			// Get an array of the properties which the user wants to search with.
 			var props = opts.seekVal.split(','); 
@@ -106,9 +107,7 @@
 							if ($input.val().length === 1){ $resultsHolder.hide(); }
 
 							// Make the search again, after the timeout delay.
-							if (timeout){ clearTimeout(timeout); }
-							timeout = setTimeout(function(){ keyChange(); }, opts.keyDelay);
-
+							refreshSearch(lastKey, timeout)
 							break;
 
 						// Tab or comma keys pressed.
@@ -131,9 +130,6 @@
 								// 		// Get the custom formated object from the new item function.
 								// 		var nData = opts.newItem.call(this, nInput);
 
-								// 		// Add the new item.
-								// 		addItem(nData);
-
 								// 		// Hide the results list.
 								// 		$resultsHolder.hide();
 
@@ -147,8 +143,7 @@
 						default:
 
 							// Other key was pressed, call the keyChange event after the timeout delay.
-							if (timeout) { clearTimeout(timeout); }
-							timeout = setTimeout(function(){ keyChange(lastKey); }, opts.keyDelay);
+							refreshSearch(lastKey, timeout)
 							break;
 					}
 				},
@@ -166,6 +161,12 @@
 				}
 			});
 
+			// Performs a new search by calling the keyChange function after the delay set.
+			function refreshSearch (timeout, lastKey) {
+				if (timeout) { clearTimeout(timeout); }
+				timeout = setTimeout(function(){ keyChange(lastKey); }, opts.keyDelay);
+			}
+
 			// Function that is executed when typing and after the key delay timeout.
 			function keyChange(lastKey) {
 
@@ -173,7 +174,7 @@
 				if ( lastKey == 46 || (lastKey > 9 && lastKey < 32) ){ return $resultsHolder.hide(); }
 
 				// Get the text from the input.
-				// Remove the slashes (\ /) and then the extra whitespaces.
+				// Remove the slashes "\" & "/" and then the extra whitespaces.
 				var string = $.trim($input.val()).replace(/[\\]+|[\/]+/g,"").replace(/\s+/g," ");
 
 				// Save the string to know what was typed by the user.
@@ -192,7 +193,8 @@
 
 					// If the data is a URL, build the query and retrieve the response in JSON format.
 					if (opts.remoteSource !== '') {
-						$.getJSON(opts.remoteSource+"?"+opts.queryParam+"="+encodeURIComponent(string)+opts.extraParams, function(response) { processData(response, string, false); });
+						if (jqxhr) { jqxhr.abort(); }
+						jqxhr = $.getJSON(opts.remoteSource+"?"+opts.queryParam+"="+encodeURIComponent(string)+opts.extraParams, function(response) { processData(response, string, false); });
 					}
 					
 					// If the local source is an object, retrieve the results directly from the source.
