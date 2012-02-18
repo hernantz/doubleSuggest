@@ -102,7 +102,8 @@
 									$('li.active:first', $resultsUL).trigger('select');
 									e.preventDefault();
 								} 
-								// else { // The tab or return keys where pressed when no results where found.
+								// else { 
+									// The tab or return keys where pressed when no results where found.
 									
 								// 	// If adding new items is allowed.
 								// 	if (opts.newItem) {
@@ -319,7 +320,7 @@
 		});
 	};
 
-	// Make the defaults globally accessable.
+	// Make the defaults accessible from outside.
 	$.fn.doubleSuggest.defaults = {
 		localSource: {}, // Object where doubleSuggest gets the suggestions from.
 		remoteSource: false, // URL where doubleSuggest gets the suggestions from.
