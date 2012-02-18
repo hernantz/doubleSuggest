@@ -172,13 +172,16 @@
 
 						// Show the loading text, and start the loading state.
 						$input.addClass('loading');
-						if(opts.loadingText) { $resultsUL.html('<li class="ds-message">'+opts.loadingText+'</li>').show(); } // FIXME - remove show()?
+						// FIXME - remove show()? not firing on ajax request
+						if(opts.loadingText) { $resultsUL.html('<li class="ds-message">'+opts.loadingText+'</li>').show(); } 
 						$resultsHolder.show();
 
 						// If the data is a URL, build the query and retrieve the response in JSON format.
 						if (opts.remoteSource !== '') {
 							if (jqxhr) { jqxhr.abort(); }
-							jqxhr = $.getJSON(opts.remoteSource+"?"+opts.queryParam+"="+encodeURIComponent(string)+opts.extraParams, function(response) { processData(response, string, false); });
+							var queryParam = {};
+							queryParam[opts.queryParam] = string;
+							jqxhr = $.getJSON(opts.remoteSource, $.extend({}, queryParam, opts.extraParams), function(response) { processData(response, string, false); });
 						}
 						
 						// If the local source is an object, retrieve the results directly from the source.
@@ -358,7 +361,7 @@
 		seekVal: 'name', // Comma separated list of object property names.
 		queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
 		queryLimit: false, // Number for 'limit' param on ajax request.
-		extraParams: '', // This will be added onto the end of the AJAX request URL. Make sure you add an '&' before each param.
+		extraParams: {}, // Key - value object to pass along with the ajax request.
 		matchCase: false, // Make the search case sensitive when set to true.
 		minChars: 1, // Minimum number of characters that must be entered before the search begins.
 		keyDelay: 500, //  The delay after a keydown on the doubleSuggest input field and before search is started.
