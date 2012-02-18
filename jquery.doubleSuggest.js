@@ -37,7 +37,7 @@
 				$input.after($resultsHolder);
 				
 				// UL where all search results and messages are placed.
-				var $resultsUL = $('<ul class="as-list"></ul>').css('width', $input.outerWidth()).appendTo($resultsHolder);
+				var $resultsUL = $('<ul class="ds-list"></ul>').css('width', $input.outerWidth()).appendTo($resultsHolder);
 
 				// Used internally to know what text was typed by the user
 				var typedText = '';
@@ -92,7 +92,7 @@
 									
 									// If the tab or return keys are pressed when an result item is active, add it.
 									// Prevent default behaviour if the comma or return keys are pressed to avoid submiting the form which doubleSuggest is part of.
-									if ((lastKey === 9 || lastKey === 13) && $('li.as-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) { 
+									if ((lastKey === 9 || lastKey === 13) && $('li.ds-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) { 
 										$('li.active:first', $resultsUL).trigger('select');
 										e.preventDefault();
 									} 
@@ -115,9 +115,14 @@
 								break;
 
 							default:
-
-								// Other key was pressed, call the keyChange event after the timeout delay.
-								refreshSearch(lastKey, timeout)
+								
+								// Ignore if the following keys are pressed: [del] [shift] [capslock] [esc]
+								if ( lastKey == 46 || (lastKey > 9 && lastKey < 32) ) { 
+									$resultsHolder.hide(); 
+								} else {
+									// Other key was pressed, call the keyChange event after the timeout delay.
+									refreshSearch(timeout)
+								}
 								break;
 						}
 					},
@@ -144,16 +149,13 @@
 				});
 
 				// Performs a new search by calling the keyChange function after the delay set.
-				function refreshSearch (timeout, lastKey) {
+				function refreshSearch (timeout) {
 					if (timeout) { clearTimeout(timeout); }
-					timeout = setTimeout(function(){ keyChange(lastKey); }, opts.keyDelay);
+					timeout = setTimeout(function(){ keyChange(); }, opts.keyDelay);
 				}
 
 				// Function that is executed when typing and after the key delay timeout.
-				function keyChange(lastKey) {
-
-					// ignore if the following keys are pressed: [del] [shift] [capslock]
-					if ( lastKey == 46 || (lastKey > 9 && lastKey < 32) ) { return $resultsHolder.hide(); }
+				function keyChange() {
 
 					// Get the text from the input.
 					// Remove the slashes "\" & "/" and then the extra whitespaces.
@@ -170,7 +172,7 @@
 
 						// Show the loading text, and start the loading state.
 						$input.addClass('loading');
-						if(opts.loadingText) { $resultsUL.html('<li class="as-message">'+opts.loadingText+'</li>').show(); } // FIXME - remove show()?
+						if(opts.loadingText) { $resultsUL.html('<li class="ds-message">'+opts.loadingText+'</li>').show(); } // FIXME - remove show()?
 						$resultsHolder.show();
 
 						// If the data is a URL, build the query and retrieve the response in JSON format.
@@ -196,7 +198,7 @@
 				function spotResult(dir) {
 
 					// If there is at least one visible item in the results list.
-					if ($('li.as-result-item:visible', $resultsHolder).length > 0) {
+					if ($('li.ds-result-item:visible', $resultsHolder).length > 0) {
 					
 						// Get all the LI elements from the results list.
 						var lis = $('li', $resultsHolder);
@@ -242,7 +244,7 @@
 						// $input.val('').focus();
 						$resultsHolder.hide();					
 					}
-				}, ".as-result-item");
+				}, ".ds-result-item");
 				
 				// Function that gets the matched results and displays them.
 				function processData (data, queryString, local) {
@@ -280,7 +282,7 @@
 								data[i]['_position'] = matchCount;
 								
 								// Build each result li element to show on the results list.
-								var resultLI = $('<li class="as-result-item" id="as-result-item-'+i+'"></li>').data(data[i]);
+								var resultLI = $('<li class="ds-result-item" id="ds-result-item-'+i+'"></li>').data(data[i]);
 								var resultData = $.extend({}, data[i]);
 
 								// Make the suggestions case sensitive or not. 
@@ -311,7 +313,7 @@
 				
 					// If no results were found, show the empty text message.
 					if (matchCount <= 0 && opts.emptyText){ 
-						$resultsUL.html('<li class="as-message">'+opts.emptyText+'</li>'); 
+						$resultsUL.html('<li class="ds-message">'+opts.emptyText+'</li>'); 
 					}
 
 					// Show the results list.
