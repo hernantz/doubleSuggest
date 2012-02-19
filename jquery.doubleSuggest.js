@@ -12,7 +12,7 @@
  * Requires jQuery > v.1.7
  */
  
-(function($){
+;(function($){
 
 	var methods = {
 		init: function (options) {
@@ -21,7 +21,7 @@
 			return this.each(function(index, element) {
 			
 				// Merge the options passed with the defaults.
-				var opts = $.extend($.fn.doubleSuggest.defaults, options);
+				var opts = $.extend({}, $.fn.doubleSuggest.defaults, options);
 			
 				// Grab the text input and it's id so we can call this plugin multiple times.
 				var $input = $(this);
@@ -33,7 +33,7 @@
 				$input.wrap($dsContainer);
 				
 				// Div that holds each result or message inside the $resultsUL. 
-				var $resultsHolder = $('<div class="as-results" id="as-results-'+input_id+'"></div>').hide();
+				var $resultsHolder = $('<div class="ds-results" id="ds-results-'+input_id+'"></div>').hide();
 				$input.after($resultsHolder);
 				
 				// UL where all search results and messages are placed.
@@ -55,7 +55,7 @@
 						if ($input.val() === opts.startText) { $input.val(''); }
 						
 						// When the input is active, highlight the selections by removing the 'blur' class.
-						$("li.as-selection-item", $dsContainer).removeClass('blur');
+						$("li.ds-selection-item", $dsContainer).removeClass('blur');
 						
 						// Show the results list if there is a value in the input.
 						if ($.trim($input.val()) !== '') { $resultsHolder.show(); }	
@@ -177,7 +177,7 @@
 						$resultsHolder.show();
 
 						// If the data is a URL, build the query and retrieve the response in JSON format.
-						if (opts.remoteSource !== '') {
+						if (opts.remoteSource) {
 							if (jqxhr) { jqxhr.abort(); }
 							var queryParam = {};
 							queryParam[opts.queryParam] = string;
@@ -219,7 +219,7 @@
 						
 						// Update the text with the currently selected item
 						// Display the text typed by the user if no result is selected
-						var newText = spot.length > 0 ? spot.data()[opts.selectedItemProp] : typedText;
+						var newText = spot.length > 0 ? spot.data()[opts.selectValue] : typedText;
 						$input.val(newText);
 					}
 				}
@@ -238,7 +238,7 @@
 
 						var data = $(this).data();
 						
-						typedText = data[opts.selectedItemProp];
+						typedText = data[opts.selectValue];
 						$input.val(typedText).focus();
 						
 						opts.onSelect.call(this, data);
@@ -253,7 +253,7 @@
 				function processData (data, queryString, local) {
 					
 					var data = opts.retrieveComplete.call(this, data, queryString), // This variable will hold the object from the source to be processed. 
-						props = opts.seekVal.split(','), // Get an array of the properties which the user wants to search with.
+						props = opts.seekValue.split(','), // Get an array of the properties which the user wants to search with.
 						matchCount = 0,
 						i = 0;
 
@@ -268,7 +268,7 @@
 
 						if (data.hasOwnProperty(k)) {
 
-							// Build a string for each element, by getting the data of all the properties in seekVal
+							// Build a string for each element, by getting the data of all the properties in seekValue
 							str = '';
 							for (var y=0; y<props.length; y++) {
 								str = str + data[i][$.trim(props[y])];
@@ -294,7 +294,7 @@
 								
 								// Highlight the results if the option is set to true.
 								if (opts.resultsHighlight) {
-									resultData[opts.selectedItemProp] = resultData[opts.selectedItemProp].replace(regx,"<em>$1</em>");
+									resultData[opts.selectValue] = resultData[opts.selectValue].replace(regx,"<em>$1</em>");
 								}
 
 								// Call the formatList function and add the LI element to the results list.
@@ -351,14 +351,14 @@
 
 	// Make the defaults globally accessable.
 	$.fn.doubleSuggest.defaults = {
-		localSource: {}, // Object where doubleSuggest gets the suggestions from.
+		localSource: false, // Object where doubleSuggest gets the suggestions from.
 		remoteSource: false, // URL where doubleSuggest gets the suggestions from.
 		startText: 'Search', // Text to display when the doubleSuggest input field is empty.
 		emptyText: false, // Text to display when their are no search results.
 		loadingText: 'Loading...', // Text to display when the results are being retrieved.
 		newItem: false, // If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
-		selectedItemProp: 'name', // Value displayed on the added item
-		seekVal: 'name', // Comma separated list of object property names.
+		selectValue: 'name', // Value displayed on the added item
+		seekValue: 'name', // Comma separated list of object property names.
 		queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
 		queryLimit: false, // Number for 'limit' param on ajax request.
 		extraParams: {}, // Key - value object to pass along with the ajax request.
@@ -367,7 +367,7 @@
 		keyDelay: 500, //  The delay after a keydown on the doubleSuggest input field and before search is started.
 		resultsHighlight: true, // Option to choose whether or not to highlight the matched text in each result item.
 		onSelect: function(data){}, // Custom function that is run when an item is added to the items holder.
-		formatList: function (data, elem) { return elem.html(data[opts.selectedItemProp]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
+		formatList: function (data, elem) { return elem.html(data[opts.selectValue]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
 		beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local objected is searched.
 		retrieveComplete: function(data, queryString){ return data; },
 		resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
