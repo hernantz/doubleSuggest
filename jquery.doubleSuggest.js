@@ -12,7 +12,7 @@
  * Requires jQuery > v.1.7
  */
  
-;(function($){
+;(function($) {
 
 	var methods = {
 		init: function (options) {
@@ -51,8 +51,6 @@
 				// Handle input field events.
 				$input.on({
 					"focus.doubleSuggest": function(e) {
-						// Remove the startText if we click on the input. 
-						if ($input.val() === opts.startText) { $input.val(''); }
 						
 						// When the input is active, highlight the selections by removing the 'blur' class.
 						$("li.ds-selection-item", $dsContainer).removeClass('blur');
@@ -127,8 +125,6 @@
 						}
 					},
 					"blur.doubleSuggest": function(e) {
-						// If no selections where made, show startText again.
-						if ($input.val() === '') { $input.val(opts.startText); }
 						
 						// If the user is no longer manipulating the results list, hide it.
 						if (!($resultsHolder.is(':hover'))){
@@ -353,7 +349,6 @@
 	$.fn.doubleSuggest.defaults = {
 		localSource: false, // Object where doubleSuggest gets the suggestions from.
 		remoteSource: false, // URL where doubleSuggest gets the suggestions from.
-		startText: 'Search', // Text to display when the doubleSuggest input field is empty.
 		emptyText: false, // Text to display when their are no search results.
 		loadingText: 'Loading...', // Text to display when the results are being retrieved.
 		newItem: false, // If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
