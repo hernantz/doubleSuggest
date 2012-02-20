@@ -24,9 +24,8 @@
 				var opts = $.extend({}, $.fn.doubleSuggest.defaults, options);
 			
 				// Grab the text input and it's id so we can call this plugin multiple times.
-				var $input = $(this);
+				var $input = $(this).addClass('ds-input');
 				var	input_id = $input.attr('id');
-				$input.attr('autocomplete', 'off').addClass('ds-input').val(opts.startText);
 				
 				// Global container of the selected items.
 				var $dsContainer = $('<div class="ds-container" id="ds-container-'+input_id+'"></div>');
