@@ -50,10 +50,6 @@
 				// Handle input field events.
 				$input.on({
 					"focus.doubleSuggest": function(e) {
-						
-						// When the input is active, highlight the selections by removing the 'blur' class.
-						$("li.ds-selection-item", $dsContainer).removeClass('blur');
-						
 						// Show the results list if there is a value in the input.
 						if ($.trim($input.val()) !== '') { $resultsHolder.show(); }	
 					},
