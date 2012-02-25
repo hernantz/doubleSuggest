@@ -1,12 +1,12 @@
 
 doubleSuggest
 
-@Version: 0.1
-@Author: hernantz 
-@Url: http://www.github.to/hernantz/doubleSuggest
-@License: MIT - http://www.opensource.org/licenses/mit-license.php
+Version: 0.1
+Author: hernantz 
+Url: http://hernantz.github.to/doubleSuggest
+License: MIT - http://www.opensource.org/licenses/mit-license.php
 
 This jQuery plugin will set up a UI that suggest results as you type. 
 It will display two types of suggestions, first (and faster) the local data 
-and also the results from an ajax search query. 
+and second (and slower) the results from an ajax search query.
 Requires jQuery >= v.1.7
