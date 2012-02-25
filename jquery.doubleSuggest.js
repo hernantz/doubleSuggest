@@ -14,14 +14,14 @@
  
 ;(function($) {
 
-	var methods = {
+	$.doubleSuggest = {
 		init: function (options) {
 			
 			// Iterate over the current set of matched elements.
 			return this.each(function(index, element) {
 			
 				// Merge the options passed with the defaultOptions.
-				var opts = $.extend({}, $.fn.doubleSuggest.defaultOptions, options);
+				var opts = $.extend({}, $.doubleSuggest.defaultOptions, options);
 			
 				// Grab the text input and it's id so we can call this plugin multiple times.
 				var $input = $(this).addClass('ds-input');
@@ -120,18 +120,16 @@
 						}
 					},
 					"blur.doubleSuggest": function(e) {
-
 						// If the user is no longer manipulating the results list, hide it.
 						if (!($resultsHolder.is(':hover'))){
 							$('li.as-selection-item', $dsContainer).addClass('blur').removeClass('selected');
 							$resultsHolder.hide();
 						}
-						
 					},
 					"updateOptions.doubleSuggest": function(e, newOptions) {
 						// Refresh the options.
 						// FIXME - Is this place the correct one to bind this option?
-						opts = $.extend($.fn.doubleSuggest.defaultOptions, options, newOptions);
+						opts = $.extend({}, opts, newOptions);
 					}, 
 					"destroy.doubleSuggest": function(e) {
 						$resultsHolder.remove();
@@ -195,22 +193,21 @@
 					if ($('li.ds-result-item:visible', $resultsHolder).length > 0) {
 					
 						// Get all the LI elements from the results list.
-						var lis = $('li', $resultsHolder);
-
+						var $lis = $('li.ds-result-item', $resultsHolder);
 						// If the direction is 'down' spot the first result. If it is 'up', spot the last result.
-						var spot = dir === 'down' ? lis.eq(0) : lis.filter(':last');
+						var $spot = dir === 'down' ? $lis.eq(0) : $lis.eq(-1);
 
 						// If a LI element was already spoted, take it as the base for future movements.
-						var active = $('li.active:first', $resultsHolder);
-						if (active.length > 0){ spot = dir === 'down' ? active.next() : active.prev(); }
+						var $active = $('li.active:first', $resultsHolder);
+						if ($active.length > 0){ $spot = dir === 'down' ? $active.next('li.ds-result-item') : $active.prev('li.ds-result-item'); }
 
 						// Set the 'active' class to the current result item.
-						lis.removeClass('active');
-						spot.addClass('active');
+						$lis.removeClass('active');
+						$spot.addClass('active');
 						
 						// Update the text with the currently selected item
 						// Display the text typed by the user if no result is selected
-						var newText = spot.length > 0 ? spot.data()[opts.selectValue] : typedText;
+						var newText = $spot.length > 0 ? $spot.data()[opts.selectValue] : typedText;
 						$input.val(newText);
 					}
 				}
@@ -331,17 +328,17 @@
 	}
 
 	$.fn.doubleSuggest = function(args) {
-		if ( methods[args] ) {
-      		return methods[args].apply(this, Array.prototype.slice.call(arguments, 1));
+		if ( $.doubleSuggest[args] ) {
+      		return $.doubleSuggest[args].apply(this, Array.prototype.slice.call(arguments, 1));
 	    } else if (typeof args === 'object' || !args) {
-	      	return methods.init.apply(this, arguments);
+	      	return $.doubleSuggest.init.apply(this, arguments);
 	    } else {
 	      	$.error('Invalid arguments ' + args + ' on jQuery.doubleSuggest');
 	    }
 	}
 
 	// Make the defaultOptions globally accessable.
-	$.fn.doubleSuggest.defaultOptions = {
+	$.doubleSuggest.defaultOptions = {
 		localSource: false, // Object where doubleSuggest gets the suggestions from.
 		remoteSource: false, // URL where doubleSuggest gets the suggestions from.
 		emptyText: false, // Text to display when their are no search results.
