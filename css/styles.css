@@ -63,11 +63,11 @@ nav ul li a:hover, nav ul li a.current-page{
 
 p.code {
   border: 1px solid #CCC;
-  border-bottom: 1px solid #999;
-  padding: 20px 10px;
+  padding: 25px 10px;
   background: #F9F9F9;
 }
 
 p.code:hover {
   box-shadow: 0px 1px 5px #CCC;
+  border-bottom: 1px solid #999;
 };
