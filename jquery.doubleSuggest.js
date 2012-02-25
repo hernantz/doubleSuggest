@@ -20,8 +20,8 @@
 			// Iterate over the current set of matched elements.
 			return this.each(function(index, element) {
 			
-				// Merge the options passed with the defaults.
-				var opts = $.extend({}, $.fn.doubleSuggest.defaults, options);
+				// Merge the options passed with the defaultOptions.
+				var opts = $.extend({}, $.fn.doubleSuggest.defaultOptions, options);
 			
 				// Grab the text input and it's id so we can call this plugin multiple times.
 				var $input = $(this).addClass('ds-input');
@@ -131,7 +131,7 @@
 					"updateOptions.doubleSuggest": function(e, newOptions) {
 						// Refresh the options.
 						// FIXME - Is this place the correct one to bind this option?
-						opts = $.extend($.fn.doubleSuggest.defaults, options, newOptions);
+						opts = $.extend($.fn.doubleSuggest.defaultOptions, options, newOptions);
 					}, 
 					"destroy.doubleSuggest": function(e) {
 						$resultsHolder.remove();
@@ -340,8 +340,8 @@
 	    }
 	}
 
-	// Make the defaults globally accessable.
-	$.fn.doubleSuggest.defaults = {
+	// Make the defaultOptions globally accessable.
+	$.fn.doubleSuggest.defaultOptions = {
 		localSource: false, // Object where doubleSuggest gets the suggestions from.
 		remoteSource: false, // URL where doubleSuggest gets the suggestions from.
 		emptyText: false, // Text to display when their are no search results.
