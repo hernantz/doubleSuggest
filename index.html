@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->
+    <meta charset=utf-8 />
+    <title>doubleSuggest jQuery plug-in</title>
+    <!--[if IE]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="css/styles.css" type="text/css"></link>
+  </head>
+  <body>
+    <h1>doubleSuggest jQuery plug-in</h1>
+    <nav>
+      <ul>
+        <li><a class="current-page" href="index.html">HOME</a></li>
+        <li>&#8226;</li>
+        <li><a href="options.html">OPTIONS</a></li>
+        <li>&#8226;</li>
+        <li><a href="http://github.com/hernantz/doubleSuggest">GET IT!</a></li>
+      </ul>
+      <div class="clear-fix"></div>
+    </nav>
+    <hr>
+    <p class="desc">
+      This jQuery plugin will set up a UI that suggest results as you type. <br>
+      It will display two types of suggestions, first (and faster) the local data 
+      and second (and slower) the results from an ajax search query. 
+      <br>
+    </p>
+    <hr>
+    
+    <h2>Simple version</h2>
+    <p>This example takes as source for the suggestions an object. But the source can be also a url where you retrieve asynchronously the suggestions from</p>
+    <pre class="code">  var dataSource = {
+          items: [
+            {value: "21", name: "Mick Jagger"},
+            {value: "43", name: "Johnny Storm"},
+            {value: "46", name: "Richard Hatch"},
+            {value: "54", name: "Kelly Slater"},
+            {value: "55", name: "Rudy Hamilton"},
+            {value: "79", name: "Michael Jordan"}
+          ]
+        };</pre>
+    <p>Associated code:</p>
+    <pre class="code">
+    // Assign the autosuggest plugin to the respective tag input.
+        $('#TagsInputField').jSuggest({
+          source: dataSource.items,
+          selectedItemProp: "name", 
+          seekVal: "name",
+          selectionAdded: function(elem, data) {
+            console.log(data.name);
+          },
+          selectionRemoved: function(elem, data) {
+            console.log(data.name);
+            elem.remove();
+          }
+          
+       });
+  </pre>
+    <p>Type "m" to see some suggestions.</p>
+    <form action="#">
+      <input type="text" id="TagsInputField"/>
+    </form>
+  <br>
+      <h2>Changelog</h2>
+      <p>
+        Version 1.0.1
+        <ul>
+          <li>Added the repeatText option.</li>
+          <li>When adding new items is allowed, the user must wait for the results to load before adding the new item.</li>
+        </ul>
+      </p>
+      <hr>
+      
+      <h2>Get the code!</h2>
+      <a href="https://github.com/hernantz/jSuggest">Fork us on GitHub!</a>. The source code fully comented and the minified code is done with <a href="http://closure-compiler.appspot.com">closure compiler</a> with the "simple" optimization option.
+      <p><b>This jSuggest jQuery plug-in is dual licensed under the MIT and GPL licenses:</b><br>
+      http:// www.opensource.org/licenses/mit-license.php
+      http:// www.gnu.org/licenses/gpl.html</p>
+  </body>
+</html>

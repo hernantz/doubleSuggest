@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <meta charset=utf-8 />
+    <title>doubleSuggest jQuery plug-in</title>
+    <!--[if IE]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="css/styles.css" type="text/css"></link>
+  </head>
+
+  <body>
+    <h1>doubleSuggest jQuery plug-in</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">HOME</a></li>
+        <li>&#8226;</li>
+        <li><a class="current-page" href="options.html">OPTIONS</a></li>
+
+        <li>&#8226;</li>
+        <li><a href="http://github.com/hernantz/doubleSuggest">GET IT!</a></li>
+      </ul>
+      <div class="clear-fix"></div>
+    </nav>
+    <hr>
+    <p class="desc">
+      This jQuery plugin will set up a UI that suggest results as you type. <br>
+      It will display two types of suggestions, first (and faster) the local data 
+      and second (and slower) the results from an ajax search query. 
+      <br>
+    </p>
+    <hr>
+
+    <h2>Options</h2>
+    <p class="code">
+    <span class="prop">source</span>: {}<br>
+    Object or URL where jSuggest gets the suggestions from.  
+    </p>
+
+    <p class="code">
+    <span class="prop">startText</span>: 'Enter a Value'<br>
+    Text to display when the jSuggest input field is empty.
+    </p>
+
+    <p class="code">
+    <span class="prop">emptyText</span>: 'No Results Found'<br>
+    ext to display when their are no search results.
+    </p>
+
+    <p class="code">
+    <span class="prop">limitText</span>: 'No More Values Are Allowed'<br>
+    Text to display when the number of selections has reached it's limit.
+    </p>
+
+    <p class="code">
+    <span class="prop">newItem</span>: false<br>
+    If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
+    </p>
+
+    <p class="code">
+    <span class="prop">newText</span>: 'Adding New Values Is Not Allowed'<br>
+    Text to display when the user tries to enter a new item by typing.
+    </p>
+
+    <p class="code">
+    <span class="prop">loadingText</span>: 'Loading...'<br>
+    Text to display when the results are being retrieved.
+    </p>
+
+    <p class="code">
+    <span class="prop">selectedItemProp</span>: 'value'<br>
+    Value displayed on the added item.
+    </p>
+
+    <p class="code">
+    <span class="prop">selectProp</span>: 'value'<br>
+    Name of object property added to the hidden input.
+    </p>
+
+    <p class="code">
+    <span class="prop">seekVal</span>: 'value'<br>
+    Comma separated list of object property names.
+    </p>
+
+    <p class="code">
+    <span class="prop">queryParam</span>: 'q'<br>
+    The name of the param that will hold the search string value in the AJAX request.
+    </p>
+
+    <p class="code">
+    <span class="prop">queryLimit</span>: false<br>
+    Number for 'limit' param on ajax request.
+    </p>
+
+    <p class="code">
+    <span class="prop">extraParams</span>: ''<br>
+    This will be added onto the end of the AJAX request URL. Make sure you add an '&' before each param.
+    </p>
+
+    <p class="code">
+    <span class="prop">matchCase</span>: false<br>
+    Make the search case sensitive when set to true.
+    </p>
+
+    <p class="code">
+    <span class="prop">minChars</span>: 1<br>
+    Minimum number of characters that must be entered before the search begins.
+    </p>
+
+    <p class="code">
+    <span class="prop">keyDelay</span>: 400<br>
+    The delay after a keydown on the jSuggest input field and before search is started.
+    </p>
+
+    <p class="code">
+    <span class="prop">resultsHighlight</span>: true <br>
+    Option to choose whether or not to highlight the matched text in each result item.
+    </p>
+
+    <p class="code">
+    <span class="prop">showResultList</span>: true<br>
+    If set to false, the Results Dropdown List will never be shown at any time.
+    </p>
+
+    <p class="code">
+    <span class="prop">spotFirst</span>: true<br>
+    Option that spots the first suggestions on the results list if true.
+    </p>
+
+    <p class="code">
+    <span class="prop">formatList</span>: false<br>
+    Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
+    </p>
+
+    <p class="code">
+    <span class="prop">beforeRetrieve</span>: function(string){ return string; }<br>
+    Custom function that is run before the AJAX request is made, or the local objected is searched.
+    </p>
+
+    <p class="code">
+    <span class="prop">retrieveComplete</span>: function(data){ return data; }<br>
+    </p>
+
+    <p class="code">
+    <span class="prop">resultsComplete</span>: function(){}<br>
+    Custom function that is run when the suggestion results dropdown list is made visible.
+    </p>
+
+  </body>
+</html>
