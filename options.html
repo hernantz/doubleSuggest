@@ -29,123 +29,117 @@
       It will display two types of suggestions, first (and faster) the local data 
       and second (and slower) the results from an ajax search query. 
       <br>
-    </p>
+    </div>
     <hr>
 
     <h2>Options</h2>
-    <p class="code">
-    <span class="prop">source</span>: {}<br>
-    Object or URL where jSuggest gets the suggestions from.  
-    </p>
+    Options are presented as <span class="prop">option</span>: <span class="default">default value</span><br>
 
-    <p class="code">
-    <span class="prop">startText</span>: 'Enter a Value'<br>
-    Text to display when the jSuggest input field is empty.
-    </p>
+    <div class="code">
+    <span class="prop">localSource</span>: <span class="default">false</span><br>
+    Expects an <b>object</b> where doubleSuggest gets the local results from.  
+    </div>
 
-    <p class="code">
-    <span class="prop">emptyText</span>: 'No Results Found'<br>
-    ext to display when their are no search results.
-    </p>
+    <div class="code">
+    <span class="prop">remoteSource</span>: <span class="default">false</span><br>
+    Expects an url <b>string</b> where doubleSuggest will load the remote results from via jQuery.getJSON().  
+    </div>
 
-    <p class="code">
-    <span class="prop">limitText</span>: 'No More Values Are Allowed'<br>
-    Text to display when the number of selections has reached it's limit.
-    </p>
+    <div class="code">
+    <span class="prop">emptyText</span>: <span class="default">'No Results Found'</span><br>
+    Text to display when their are no search results.
+    </div>
 
-    <p class="code">
-    <span class="prop">newItem</span>: false<br>
-    If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
-    </p>
+    <div class="code">
+    <span class="prop">loadingText</span>: <span class="default">'Loading...'</span><br>
+    Text to display when the results are being retrieved. Set it to <b>false</b> if you don't want this text to be displayed.
+    </div>
 
-    <p class="code">
-    <span class="prop">newText</span>: 'Adding New Values Is Not Allowed'<br>
-    Text to display when the user tries to enter a new item by typing.
-    </p>
+    <div class="code">
+    <span class="prop">selectValue</span>: <span class="default">'value'</span><br>
+    Name of object property passed as data source to doubleSuggest that is going to be displayed in the results list.
+    </div>
 
-    <p class="code">
-    <span class="prop">loadingText</span>: 'Loading...'<br>
-    Text to display when the results are being retrieved.
-    </p>
+    <div class="code">
+    <span class="prop">seekValue</span>: <span class="default">'value'</span><br>
+    Comma separated list of object property names passed as data source to doubleSuggest used to search for results.
+    </div>
 
-    <p class="code">
-    <span class="prop">selectedItemProp</span>: 'value'<br>
-    Value displayed on the added item.
-    </p>
-
-    <p class="code">
-    <span class="prop">selectProp</span>: 'value'<br>
-    Name of object property added to the hidden input.
-    </p>
-
-    <p class="code">
-    <span class="prop">seekVal</span>: 'value'<br>
-    Comma separated list of object property names.
-    </p>
-
-    <p class="code">
-    <span class="prop">queryParam</span>: 'q'<br>
+    <div class="code">
+    <span class="prop">queryParam</span>: <span class="default">'q'</span><br>
     The name of the param that will hold the search string value in the AJAX request.
-    </p>
+    </div>
 
-    <p class="code">
-    <span class="prop">queryLimit</span>: false<br>
+    <div class="code">
+    <span class="prop">extraParams</span>: <span class="default">{}</span><br>
+    Key - value object to pass along with the ajax request.
+    </div>
+
+    <div class="code">
+    <span class="prop">queryLimit</span>: <span class="default">false</span><br>
     Number for 'limit' param on ajax request.
-    </p>
+    </div>
 
-    <p class="code">
-    <span class="prop">extraParams</span>: ''<br>
-    This will be added onto the end of the AJAX request URL. Make sure you add an '&' before each param.
-    </p>
+    <div class="code">
+    <span class="prop">matchCase</span>: <span class="default">false</span><br>
+    Makes the search case sensitive when set to true.
+    </div>
 
-    <p class="code">
-    <span class="prop">matchCase</span>: false<br>
-    Make the search case sensitive when set to true.
-    </p>
-
-    <p class="code">
-    <span class="prop">minChars</span>: 1<br>
+    <div class="code">
+    <span class="prop">minChars</span>: <span class="default">1</span><br>
     Minimum number of characters that must be entered before the search begins.
-    </p>
+    </div>
 
-    <p class="code">
-    <span class="prop">keyDelay</span>: 400<br>
-    The delay after a keydown on the jSuggest input field and before search is started.
-    </p>
+    <div class="code">
+    <span class="prop">keyDelay</span>: <span class="default">500</span><br>
+    The delay after a keydown on the input field triggers a new search.
+    </div>
 
-    <p class="code">
-    <span class="prop">resultsHighlight</span>: true <br>
+    <div class="code">
+    <span class="prop">resultsHighlight</span>: <span class="default">true</span><br>
     Option to choose whether or not to highlight the matched text in each result item.
-    </p>
+    </div>
 
-    <p class="code">
-    <span class="prop">showResultList</span>: true<br>
-    If set to false, the Results Dropdown List will never be shown at any time.
-    </p>
+    <div class="code">
+    <span class="prop">formatList</span>: <span class="default">function (data, elem) { return elem.html(data[opts.selectValue]); }</span><br>
+    Custom function that is run after all the data has been retrieved and before each result is put into the suggestion results list. 
+    <br>
+    Here you can modify how results are presented, like adding an image for example. <b>You need to return the html li element</b>.
+    <ul>
+        <li><u>data</u>: object containing the data for each element to be displayed, plus some metadata provided by doubleSuggest such as <b>"_dataSource"</b> that can be [local|remote], and <b>"_number"</b> which is the position of each element.</li>
+        <li><u>elem</u>: is the html li object where you need to inser your custom formated data.</li>
+    </ul>
+    </div>
 
-    <p class="code">
-    <span class="prop">spotFirst</span>: true<br>
-    Option that spots the first suggestions on the results list if true.
-    </p>
+    <div class="code">
+    <span class="prop">beforeRetrieve</span>: <span class="default">function(queryString){ return string; }</span><br>
+    Custom function that is run before the AJAX request is made, or the local object is searched. <b>You need to return a string</b>.
+    <ul>
+        <li><u>queryString</u>: the current text entered in the input.</li>
+    </ul>
+    </div>
 
-    <p class="code">
-    <span class="prop">formatList</span>: false<br>
-    Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
-    </p>
+    <div class="code">
+    <span class="prop">onSelect</span>: <span class="default">function(data){}</span><br>
+    Custom function that is run when a result is selected with a mouse click or via enter / tab keys.
+    <ul>
+        <li><u>data</u>: the current data associated with the selected result, plus some metadata provided by doubleSuggest such as <b>"_dataSource"</b> that can be [local|remote], and <b>"_number"</b> which is the position of each element.</li>
+    </ul>
+    </div>
 
-    <p class="code">
-    <span class="prop">beforeRetrieve</span>: function(string){ return string; }<br>
-    Custom function that is run before the AJAX request is made, or the local objected is searched.
-    </p>
+    <div class="code">
+    <span class="prop">retrieveComplete</span>: <span class="default">function(data, queryString){ return data; }</span><br>
+    Use the function to modify the data that is going to be processed by doubleSuggest. <b>You need to return a valid data source object</b>.
+        <ul>
+            <li><u>data</u>: the current data object that is about to be processed.</li>
+            <li><u>queryString</u>: the current text entered in the input.</li>
+        </ul>
+    </div>
 
-    <p class="code">
-    <span class="prop">retrieveComplete</span>: function(data){ return data; }<br>
-    </p>
-
-    <p class="code">
-    <span class="prop">resultsComplete</span>: function(){}<br>
+    <div class="code">
+    <span class="prop">resultsComplete</span>: <span class="default">function(){}</span><br>
     Custom function that is run when the suggestion results dropdown list is made visible.
-    </p>
+    </div>
 
   </body>
 </html>

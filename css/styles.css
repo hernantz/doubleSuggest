@@ -57,17 +57,29 @@ nav ul li a:hover, nav ul li a.current-page{
   font-weight: bold;
 }
 
-.prop {
-  color: #FF007F;
+span.prop {
+  color: #FF0045;
+  font-family: arial;
+  font-weight: bold;
 }
 
-p.code {
+span.default {
+  color: green;
+  padding-left: 10px;
+}
+
+div.code {
+  margin: 20px 0px;
   border: 1px solid #CCC;
-  padding: 25px 10px;
+  padding: 20px;
   background: #F9F9F9;
 }
 
-p.code:hover {
+div.code:hover {
   box-shadow: 0px 1px 5px #CCC;
   border-bottom: 1px solid #999;
-};
+}
+
+div.code span {
+  line-height: 2;
+}
