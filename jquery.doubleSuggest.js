@@ -14,14 +14,14 @@
  
 ;(function($) {
 
-	$.doubleSuggest = {
+	var methods = {
 		init: function (options) {
 			
 			// Iterate over the current set of matched elements.
 			return this.each(function(index, element) {
 			
 				// Merge the options passed with the defaultOptions.
-				var opts = $.extend({}, $.doubleSuggest.defaultOptions, options);
+				var opts = $.extend({}, $.fn.doubleSuggest.defaultOptions, options);
 			
 				// Grab the text input and it's id so we can call this plugin multiple times.
 				var $input = $(this).addClass('ds-input');
@@ -120,16 +120,18 @@
 						}
 					},
 					"blur.doubleSuggest": function(e) {
+
 						// If the user is no longer manipulating the results list, hide it.
 						if (!($resultsHolder.is(':hover'))){
 							$('li.as-selection-item', $dsContainer).addClass('blur').removeClass('selected');
 							$resultsHolder.hide();
 						}
+						
 					},
 					"updateOptions.doubleSuggest": function(e, newOptions) {
 						// Refresh the options.
 						// FIXME - Is this place the correct one to bind this option?
-						opts = $.extend({}, opts, newOptions);
+						opts = $.extend($.fn.doubleSuggest.defaultOptions, options, newOptions);
 					}, 
 					"destroy.doubleSuggest": function(e) {
 						$resultsHolder.remove();
@@ -193,21 +195,22 @@
 					if ($('li.ds-result-item:visible', $resultsHolder).length > 0) {
 					
 						// Get all the LI elements from the results list.
-						var $lis = $('li.ds-result-item', $resultsHolder);
+						var lis = $('li', $resultsHolder);
+
 						// If the direction is 'down' spot the first result. If it is 'up', spot the last result.
-						var $spot = dir === 'down' ? $lis.eq(0) : $lis.eq(-1);
+						var spot = dir === 'down' ? lis.eq(0) : lis.filter(':last');
 
 						// If a LI element was already spoted, take it as the base for future movements.
-						var $active = $('li.active:first', $resultsHolder);
-						if ($active.length > 0){ $spot = dir === 'down' ? $active.next('li.ds-result-item') : $active.prev('li.ds-result-item'); }
+						var active = $('li.active:first', $resultsHolder);
+						if (active.length > 0){ spot = dir === 'down' ? active.next() : active.prev(); }
 
 						// Set the 'active' class to the current result item.
-						$lis.removeClass('active');
-						$spot.addClass('active');
+						lis.removeClass('active');
+						spot.addClass('active');
 						
 						// Update the text with the currently selected item
 						// Display the text typed by the user if no result is selected
-						var newText = $spot.length > 0 ? $spot.data()[opts.selectValue] : typedText;
+						var newText = spot.length > 0 ? spot.data()[opts.selectValue] : typedText;
 						$input.val(newText);
 					}
 				}
@@ -270,7 +273,7 @@
 							  
 							  	// Set a flag for each data source, and also attach the element's position
 								data[i]['_dataSource'] = local ? 'local' : 'remote';
-								data[i]['_position'] = matchCount;
+								data[i]['_number'] = matchCount;
 								
 								// Build each result li element to show on the results list.
 								var resultLI = $('<li class="ds-result-item" id="ds-result-item-'+i+'"></li>').data(data[i]);
@@ -286,7 +289,8 @@
 								}
 
 								// Call the formatList function and add the LI element to the results list.
-								$resultsUL.append(opts.formatList.call(this, resultData, resultLI));
+								var elem = opts.formatList ? opts.formatList.call(this, resultData, resultLI) : resultLI.html(resultData[opts.selectValue]);
+								$resultsUL.append(elem);
 
 								// Increment the results counter after each result is added to the results list.
 								matchCount++;
@@ -328,35 +332,35 @@
 	}
 
 	$.fn.doubleSuggest = function(args) {
-		if ( $.doubleSuggest[args] ) {
-      		return $.doubleSuggest[args].apply(this, Array.prototype.slice.call(arguments, 1));
+		if ( methods[args] ) {
+      		return methods[args].apply(this, Array.prototype.slice.call(arguments, 1));
 	    } else if (typeof args === 'object' || !args) {
-	      	return $.doubleSuggest.init.apply(this, arguments);
+	      	return methods.init.apply(this, arguments);
 	    } else {
 	      	$.error('Invalid arguments ' + args + ' on jQuery.doubleSuggest');
 	    }
 	}
 
 	// Make the defaultOptions globally accessable.
-	$.doubleSuggest.defaultOptions = {
-		localSource: false, // Object where doubleSuggest gets the suggestions from.
+	$.fn.doubleSuggest.defaultOptions = {
+		localSource: false, // List of objects where doubleSuggest gets the suggestions from.
 		remoteSource: false, // URL where doubleSuggest gets the suggestions from.
 		emptyText: false, // Text to display when their are no search results.
 		loadingText: 'Loading...', // Text to display when the results are being retrieved.
 		newItem: false, // If set to false, the user will not be able to add new items by any other way than by selecting from the suggestions list.
-		selectValue: 'name', // Value displayed on the added item
+		selectValue: 'name', // Name of object property passed as data source to doubleSuggest that is going to be displayed in the results list.
 		seekValue: 'name', // Comma separated list of object property names.
 		queryParam: 'q', // The name of the param that will hold the search string value in the AJAX request.
 		queryLimit: false, // Number for 'limit' param on ajax request.
 		extraParams: {}, // Key - value object to pass along with the ajax request.
 		matchCase: false, // Make the search case sensitive when set to true.
 		minChars: 1, // Minimum number of characters that must be entered before the search begins.
-		keyDelay: 500, //  The delay after a keydown on the doubleSuggest input field and before search is started.
+		keyDelay: 500, // The delay after a keydown on the input field triggers a new search.
 		resultsHighlight: true, // Option to choose whether or not to highlight the matched text in each result item.
-		onSelect: function(data){}, // Custom function that is run when an item is added to the items holder.
-		formatList: function (data, elem) { return elem.html(data[opts.selectValue]); }, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list. 
-		beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local objected is searched.
-		retrieveComplete: function(data, queryString){ return data; },
+		onSelect: function(data){}, // Custom function that is run when a result is selected with a mouse click or enter / tab key press.
+		formatList: false, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list.
+		beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local object is searched.
+		retrieveComplete: function(data, queryString){ return data; }, // Custom function that is run before the current data object is processed.
 		resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
 	}
 })(jQuery);
