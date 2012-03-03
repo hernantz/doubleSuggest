@@ -241,14 +241,14 @@
 				}, ".ds-result-item");
 				
 				// Function that gets the matched results and displays them.
-				function processData (data, queryString, local) {
+				function processData (data, queryString, isLocal) {
 					
-					var data = opts.retrieveComplete.call(this, data, queryString), // This variable will hold the object from the source to be processed. 
+					var data = opts.retrieveComplete.call(this, data, queryString, isLocal), // This variable will hold the object from the source to be processed. 
 						props = opts.seekValue.split(','), // Get an array of the properties which the user wants to search with.
 						matchCount = 0,
 						i = 0;
 
-					if (local) {
+					if (isLocal) {
 						// Clean and hide the results container.				  
 						$resultsUL.html('');
 						$resultsHolder.hide();
@@ -272,7 +272,7 @@
 							if (str.search(queryString) !== -1) {
 							  
 							  	// Set a flag for each data source, and also attach the element's position
-								data[i]['_dataSource'] = local ? 'local' : 'remote';
+								data[i]['_dataSource'] = isLocal ? 'local' : 'remote';
 								data[i]['_number'] = matchCount;
 								
 								// Build each result li element to show on the results list.
@@ -360,7 +360,7 @@
 		onSelect: function(data){}, // Custom function that is run when a result is selected with a mouse click or enter / tab key press.
 		formatList: false, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list.
 		beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local object is searched.
-		retrieveComplete: function(data, queryString){ return data; }, // Custom function that is run before the current data object is processed.
+		retrieveComplete: function(data, queryString, isLocal){ return data; }, // Custom function that is run before the current data object is processed.
 		resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
 	}
 })(jQuery);
