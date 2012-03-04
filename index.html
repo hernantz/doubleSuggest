@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->
     <meta charset=utf-8 />
     <title>doubleSuggest jQuery plug-in</title>
-    <!--[if IE]>
-      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.doubleSuggest.js"></script>
+    <script type="text/javascript" src="js/shCore.js"></script>
+    <script type="text/javascript" src="js/shBrushJScript.js"></script>
+    <script type="text/javascript" src="js/shBrushXml.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/shCoreRDark.css"/>
     <link rel="stylesheet" href="css/styles.css" type="text/css"></link>
+    <link rel="stylesheet" href="css/doubleSuggest.css" type="text/css"></link>
+    <script type="text/javascript">
+        SyntaxHighlighter.defaults['gutter'] = false;
+        SyntaxHighlighter.all();
+    </script>
   </head>
   <body>
-    <h1>doubleSuggest jQuery plug-in</h1>
+    <h1>doubleSuggest</h1>
     <nav>
       <ul>
         <li><a class="current-page" href="index.html">HOME</a></li>
@@ -29,47 +36,169 @@
       <br>
     </p>
     <hr>
-    
-    <h2>Simple version</h2>
-    <p>This example takes as source for the suggestions an object. But the source can be also a url where you retrieve asynchronously the suggestions from</p>
-    <pre class="code">  var dataSource = {
-          items: [
-            {value: "21", name: "Mick Jagger"},
-            {value: "43", name: "Johnny Storm"},
-            {value: "46", name: "Richard Hatch"},
-            {value: "54", name: "Kelly Slater"},
-            {value: "55", name: "Rudy Hamilton"},
-            {value: "79", name: "Michael Jordan"}
-          ]
-        };</pre>
-    <p>Associated code:</p>
-    <pre class="code">
-    // Assign the autosuggest plugin to the respective tag input.
-        $('#TagsInputField').jSuggest({
-          source: dataSource.items,
-          selectedItemProp: "name", 
-          seekVal: "name",
-          selectionAdded: function(elem, data) {
-            console.log(data.name);
-          },
-          selectionRemoved: function(elem, data) {
-            console.log(data.name);
-            elem.remove();
-          }
-          
-       });
-  </pre>
-    <p>Type "m" to see some suggestions.</p>
-    <form action="#">
-      <input type="text" id="TagsInputField"/>
-    </form>
-  <br>
 
-      <hr>
+    <br>
+    <form action="#" style="width: 500px; margin: 0px auto;">
+    <p>Type to get band suggestions from <a href="http://spotify.com">Spotify</a>.</p>
+      <input type="text" style="width: 500px;" id="search" placeholder="This is the input's native placerholder attribute" autocomplete="off"/>
+    </form>
+    <br>
+
+    <h2>Quick setup tour</h2>
+    <p>We will build a band search feature that will suggest the user's favorites first and also search remotly from spotify. <br/> 
+    Include the jQuery library + jquery.doubleSuggest.js + doubleSuggest.css and then insert the input. <b>Note the placeholder and autocomplete attributes.</b>
+    </p>
+      <!-- // <script src="https://gist.github.com/1919467.js?file=gistfile1.js"></script> -->
+    <pre class="brush: html;">
+        <input type="text" id="search" placeholder="Search" autocomplete="off" />
+    </pre>
+    
+    <p>As localSource, some "favorite bands" will be served quickly. This feature can be used for caching searchable content that the user may want to access faster, like Facebook does when suggesting friends as you search for example.</p>
+    <pre class="brush: js;">
+        var favoriteBands = [
+            { "band_id":"1", "name":"Metallica", "cover":"http://..." },
+            { "band_id":"2", "name":"Megadeth", "cover":"http://..." },
+            { "band_id":"3", "name":"Slayer", "cover":"http://..." },
+            { "band_id":"4", "name":"Blackguard", "cover":"http://..." },
+            { "band_id":"5", "name":"Limp Bizkit", "cover":"http://..." },
+            { "band_id":"6", "name":"Iron Maiden", "cover":"http://..." },
+            { "band_id":"7", "name":"Our Last Night", "cover":"http://..." }
+        ];
+    </pre>
+
+    <p>Bind the plugin to an input and tell it which part of the source to search. For this you have the <b>seekValue</b> option that accepts a comma separated list of attributes to search on (like "title, artist, albums").<br>
+    <b>selectValue</b> is the property that will fill the input when you hover or select a result. As both are "name" by default the are not really needed. 
+    <br>
+    We send the user query in the <b>queryParam</b> to Spotify as you can see in the <b>remoteSource</b> option. Spotify uses "q" which is the default.
+    </p>
+    <pre class="brush: js;">
+        $('#search').doubleSuggest({
+            localSource: favoriteBands,
+            remoteSource: "http://ws.spotify.com/search/1/artist.json",
+            selectValue: "name", 
+            seekValue: "name", // Can be "title, albums, genre"
+            queryParam: "q" // By default is "q", so not needed
+        });
+    </pre>
+
+    <p>As Spotify does not have a param to limit the number of results returned, we will use the <b>retrieveComplete</b> callback to slice just 6 results and return that as the data be processed.<br>
+    Also we got some album covers for the fav bands, so <b>formatList</b> function will allow us to insert those images in the results list.</p>
+    <pre class="brush: js;">
+        $(function(){
+            $('#search').doubleSuggest({
+                localSource: favoriteBands,
+                remoteSource: "http://ws.spotify.com/search/1/artist.json",
+                retrieveComplete: function (data, queryParam, isLocal) {
+                    if(!isLocal) return data.artists.slice(0,6);
+                    else return data;
+                },
+                formatList: function(data, elem) {
+                    if (data['_dataSource'] == 'local') {
+                        var html = "<div>
+                                    <img src="+data['cover']+" /> 
+                                    <span>"+data['name']+"</span>
+                                    </div>";
+                    } else {
+                        var html = "<div>" + data['name'] + "</div>";
+                    }
+                    return elem.html(html);
+                },
+                onSelect: function(elem, data) {
+                    console.log(data);
+                }
+            });
+        });
+    </pre>
+      <script type="text/javascript">
+        $(function(){
+
+            var favoriteBands = [
+                {
+                    "band_id":"84",
+                    "name":"Metallica",
+                    "cover":"http://c2178919.r19.cf2.rackcdn.com/small_9f57602a3df411e1be054040ccbc51ae.jpg"
+                },
+                {
+                    "band_id":"85",
+                    "name":"Megadeth",
+                    "cover":"http://c969511.r11.cf2.rackcdn.com/small_13247671274ef657975d210.jpg"
+                },
+                {
+                    "band_id":"92",
+                    "name":"Slayer",
+                    "cover":"http://c947650.r50.cf2.rackcdn.com/small_12695399454ec835a905368.jpg"
+                },
+                {
+                    "band_id":"11",
+                    "name":"Blackguard",
+                    "cover":"http://c4222318.r18.cf2.rackcdn.com/small_1e2c0480430b11e1be364040a407f32f.jpg"
+                },
+                {
+                    "band_id":"65",
+                    "name":"Limp Bizkit",
+                    "cover":"http://c7161703.r3.cf2.rackcdn.com/small_cafa93da5cd211e1971840405732574f.jpg"
+                },
+                {
+                    "band_id":"6",
+                    "name":"Our Last Night",
+                    "cover":"http://c6851990.r90.cf2.rackcdn.com/small_81e81b205bee11e19eb440405732574f.jpg"
+                },
+                {
+                    "band_id":"920",
+                    "name":"Iron Maiden",
+                    "cover":"http://c961317.r17.cf2.rackcdn.com/small_13244306044ef1350c02b3d.jpg"
+                }
+            ];
+
+            $('#search').doubleSuggest({
+                localSource: favoriteBands,
+                remoteSource: "http://ws.spotify.com/search/1/artist.json",
+                selectValue: "name", 
+                seekValue: "name, tags",
+                queryParam: "q",
+                retrieveComplete: function (data, queryParam, isLocal) {
+                    if(!isLocal) return data.artists.slice(0,6);
+                    else return data;
+                },
+                formatList: function(data, elem) {
+                    if (data['_dataSource'] == 'local') {
+                        var html = "<div style='clear:both; display: table-cell; width: 100%;'><img style='float: left;' width='45' src='"+data['cover']+"' /> <span style='float: left; padding: 15px 0 0 10px;'>"+data['name']+"</span></div>";
+                    } else {
+                        var html = "<div style='clear:both; display: table-cell; width: 100%;'>"+data['name']+"</div>";
+                    }
+                    return elem.html(html);
+                    },
+                onSelect: function(elem, data) {
+                    console.log(data);
+                }
+            });
+        });
+      </script>
       
-      <h2>Get the code!</h2>
-      <a href="https://github.com/hernantz/doubleSuggest">Fork us on GitHub!</a>. The source code fully comented and the minified code is done with <a href="http://closure-compiler.appspot.com">closure compiler</a> with the "simple" optimization option.
-      <p><b>This doubleSuggest jQuery plug-in is licensed under the MIT license:</b><br>
-      http://www.opensource.org/licenses/mit-license.php</p>
+      <br>
+      
+      <h2>Update and destroy</h2>
+      It is sometimes usefull to update some settings programatically. Use the update param to modify any of the doubleSuggest's options at runtime.
+      <pre class="brush: js;">
+        $.getJSON('/getNewBands', function (response) {
+            $('#test, #test2').doubleSuggest('update', { 
+                localSource: response,
+                minChars: 2 
+            });
+        });
+      </pre>
+
+      To unbind all doubleSuggest's methods (and remove all the UI) use the destroy param.
+      <pre class="brush: js;">
+        $("#searchBands, #searchSongs").doubleSuggest("destroy");
+      </pre>
+      
+      <br>
+      
+      <h2>Thinking on improving it?</h2>
+      <a href="https://github.com/hernantz/doubleSuggest">Fork us on GitHub!</a>. The source code fully comented. <a href="http://closure-compiler.appspot.com">Closure compiler</a> with the "simple" optimization option was used for the minified version.
+      <p>
+        <b>This doubleSuggest jQuery plug-in is licensed under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT license</a></b>
+      </p>
   </body>
 </html>

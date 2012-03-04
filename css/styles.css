@@ -1,15 +1,18 @@
 body{
-  width: 600px;
+  width: 650px;
   margin: 0px auto;
   padding-bottom: 50px;
   background: #F2F2F2;
+  background-image: url(http://s.ytimg.com/yt/imgbin/www-refreshbg-vflC3wnbM.png);
   font-family: helvetica;
 }
 
 h1 {
-  color: #333;
-  text-shadow: #999 0px 2px 2px;
+  color: #444;
+  /*text-shadow: #999 0px 2px 2px;*/
+  text-shadow: rgba(0,0,0,0.5) -1px 0, rgba(0,0,0,1) 0 -1px, rgba(255,255,255,1) 1px -3px, rgba(0,0,0,0.3) -1px -2px;
   text-align: center;
+  font-size: 50px;
 }
 
 p.desc {
@@ -20,32 +23,29 @@ p.desc {
 nav ul{
   list-style: none;
   margin: 0px auto;
-  width: 295px;
+  width: 330px;
   padding: 0px;
   text-align: center;
 }
 
 nav ul li{
   float: left;
+  font-size: 20px;
 }
 
 nav ul li a{
   color: #FF0045;
   padding: 15px;
-  font-size: 15px;
   font-weight: bold;
   text-decoration: none;
 }
 
-
 nav ul li a:hover, nav ul li a.current-page{
-  color: #333;
-  text-decoration: underline;
-  text-shadow: #999 0px 1px 1px;
-  -webkit-transition:color .2s ease-in;  
-  -moz-transition:color .2s ease-in;  
-  -o-transition:color .2s ease-in;  
-  transition:color .2s ease-in; 
+  color: #000;
+  -webkit-transition: color 2s ease-in;  
+  -moz-transition:color .3s ease-in;  
+  -o-transition:color .3s ease-in;  
+  transition:color .9s ease-in; 
 }
 
 .clear-fix{
@@ -61,11 +61,13 @@ span.prop {
   color: #FF0045;
   font-family: arial;
   font-weight: bold;
+  font-size: 20px;
 }
 
 span.default {
   color: green;
   padding-left: 10px;
+  font-size: 17px;
 }
 
 div.code {
