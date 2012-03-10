@@ -195,22 +195,25 @@
 					if ($('li.ds-result-item:visible', $resultsHolder).length > 0) {
 					
 						// Get all the LI elements from the results list.
-						var lis = $('li', $resultsHolder);
+						var $lis = $('li', $resultsHolder);
 
 						// If the direction is 'down' spot the first result. If it is 'up', spot the last result.
-						var spot = dir === 'down' ? lis.eq(0) : lis.filter(':last');
+						var $spot = dir === 'down' ? $lis.eq(0) : $lis.filter(':last');
 
 						// If a LI element was already spoted, take it as the base for future movements.
-						var active = $('li.active:first', $resultsHolder);
-						if (active.length > 0){ spot = dir === 'down' ? active.next() : active.prev(); }
+						var $active = $('li.active:first', $resultsHolder);
+						if ($active.length > 0){ $spot = dir === 'down' ? $active.next() : $active.prev(); }
 
 						// Set the 'active' class to the current result item.
-						lis.removeClass('active');
-						spot.addClass('active');
+						$lis.removeClass('active');
+						$spot.addClass('active');
 						
+						// Call the custom onResultFocus function.
+						if ($spot.length > 0) { opts.onResultFocus.call($input, $spot.data()); }
+
 						// Update the text with the currently selected item
 						// Display the text typed by the user if no result is selected
-						var newText = spot.length > 0 ? spot.data()[opts.selectValue] : typedText;
+						var newText = $spot.length > 0 ? $spot.data()[opts.selectValue] : typedText;
 						$input.val(newText);
 					}
 				}
@@ -224,19 +227,22 @@
 						// When the mouse is over a suggestion, spot it.
 						$('li', $resultsUL).removeClass('active');
 						$(this).addClass('active');
+
+						// Call the custom onResultFocus function.
+						opts.onResultFocus.call($input, $(this).data());
 					},
 					select: function(e) {
 
-						var data = $(this).data();
-						
+						var $elem = $(this);
+						var data = $elem.data();
 						typedText = data[opts.selectValue];
 						$input.val(typedText).focus();
 						
-						opts.onSelect.call(this, data);
+						opts.onSelect.call($input, data, $elem);
 
 						// Clear the input? and hide the results list.
 						// $input.val('').focus();
-						$resultsHolder.hide();					
+						$resultsHolder.hide();			
 					}
 				}, ".ds-result-item");
 				
@@ -289,8 +295,8 @@
 								}
 
 								// Call the formatList function and add the LI element to the results list.
-								var elem = opts.formatList ? opts.formatList.call(this, resultData, resultLI) : resultLI.html(resultData[opts.selectValue]);
-								$resultsUL.append(elem);
+								var $elem = opts.formatList ? opts.formatList.call($input, resultData, resultLI) : resultLI.html(resultData[opts.selectValue]);
+								$resultsUL.append($elem);
 
 								// Increment the results counter after each result is added to the results list.
 								matchCount++;
@@ -358,6 +364,7 @@
 		keyDelay: 500, // The delay after a keydown on the input field triggers a new search.
 		resultsHighlight: true, // Option to choose whether or not to highlight the matched text in each result item.
 		onSelect: function(data){}, // Custom function that is run when a result is selected with a mouse click or enter / tab key press.
+		onResultFocus: function(data){}, // Custom function that is run when a result is focused on mouse over / up - down key navigation.
 		formatList: false, // Custom function that is run after all the data has been retrieved and before the results are put into the suggestion results list.
 		beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local object is searched.
 		retrieveComplete: function(data, queryString, isLocal){ return data; }, // Custom function that is run before the current data object is processed.

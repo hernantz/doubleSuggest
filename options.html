@@ -107,9 +107,10 @@
     Custom function that is run after all the data has been retrieved and before each result is put into the suggestion results list. 
     <br>
     Here you can modify how results are presented, like adding an image for example. <b>You need to return the html li element</b>.
+    <br/><b>"this"</b> inside this function points to the input which doubleSuggest is binded to.
     <ul>
         <li><u>data</u>: object containing the data for each element to be displayed, plus some metadata provided by doubleSuggest such as <b>"_dataSource"</b> that can be [local|remote], and <b>"_number"</b> which is the position of each element.</li>
-        <li><u>elem</u>: is the html li object where you need to inser your custom formated data.</li>
+        <li><u>$elem</u>: is the html li jQuery object where you need to insert your custom formated data.</li>
     </ul>
     </div>
 
@@ -122,10 +123,22 @@
     </div>
 
     <div class="code">
-    <span class="prop">onSelect</span>: <span class="default">function(data){}</span><br>
-    Custom function that is run when a result is selected with a mouse click or via enter / tab keys.
+    <span class="prop">onSelect</span>: <span class="default">function(data, $elem){}</span><br>
+    Custom function that is run when a result is selected with a mouse click or via enter / tab keys. 
+    <br/><b>"this"</b> inside this function points to the input which doubleSuggest is binded to.
     <ul>
         <li><u>data</u>: the current data associated with the selected result, plus some metadata provided by doubleSuggest such as <b>"_dataSource"</b> that can be [local|remote], and <b>"_number"</b> which is the position of each element.</li>
+        <li><u>$elem</u>: is the html li jQuery object that was selected from the results list.</li>
+    </ul>
+    </div>    
+
+    <div class="code">
+    <span class="prop">onResultFocus</span>: <span class="default">function(data, $elem){}</span><br>
+    Custom function that is run whena result is focused on mouse over / up - down key navigation.
+    <br/><b>"this"</b> inside this function points to the input which doubleSuggest is binded to.
+    <ul>
+        <li><u>data</u>: the current data associated with the selected result, plus some metadata provided by doubleSuggest such as <b>"_dataSource"</b> that can be [local|remote], and <b>"_number"</b> which is the position of each element.</li>
+        <li><u>$elem</u>: is the html li jQuery object that was selected from the results list.</li>
     </ul>
     </div>
 

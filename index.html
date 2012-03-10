@@ -46,7 +46,8 @@
 
     <h2>Quick setup tour</h2>
     <p>We will build a band search feature that will suggest the user's favorites first and also search remotly from spotify. <br/> 
-    Include the jQuery library + jquery.doubleSuggest.js + doubleSuggest.css and then insert the input. <b>Note the placeholder and autocomplete attributes.</b>
+    Include the jQuery library <b>(requires v1.7 or higher)</b>, jquery.doubleSuggest.js and doubleSuggest.css and then insert the input. 
+    <br><b>Note the placeholder and autocomplete attributes.</b>
     </p>
       <!-- // <script src="https://gist.github.com/1919467.js?file=gistfile1.js"></script> -->
     <pre class="brush: html;">
@@ -92,7 +93,7 @@
                     if(!isLocal) return data.artists.slice(0,6);
                     else return data;
                 },
-                formatList: function(data, elem) {
+                formatList: function(data, $elem) {
                     if (data['_dataSource'] == 'local') {
                         var html = "<div>
                                     <img src="+data['cover']+" /> 
@@ -101,9 +102,9 @@
                     } else {
                         var html = "<div>" + data['name'] + "</div>";
                     }
-                    return elem.html(html);
+                    return $elem.html(html);
                 },
-                onSelect: function(data) {
+                onSelect: function(data, $elem) {
                     console.log(data);
                 }
             });
@@ -160,15 +161,15 @@
                     if(!isLocal) return data.artists.slice(0,6);
                     else return data;
                 },
-                formatList: function(data, elem) {
+                formatList: function(data, $elem) {
                     if (data['_dataSource'] == 'local') {
                         var html = "<div style='clear:both; display: table-cell; width: 100%;'><img style='float: left;' width='45' src='"+data['cover']+"' /> <span style='float: left; padding: 15px 0 0 10px;'>"+data['name']+"</span></div>";
                     } else {
                         var html = "<div style='clear:both; display: table-cell; width: 100%;'>"+data['name']+"</div>";
                     }
-                    return elem.html(html);
+                    return $elem.html(html);
                     },
-                onSelect: function(data) {
+                onSelect: function(data, $elem) {
                     console.log(data);
                 }
             });
@@ -178,7 +179,7 @@
       <br>
       
       <h2>Update and destroy</h2>
-      It is sometimes usefull to update some settings programatically. Use the update param to modify any of the doubleSuggest's options at runtime.
+      It is sometimes useful to update some settings programatically. Use the update param to modify any of the doubleSuggest's options at runtime.
       <pre class="brush: js;">
         $.getJSON('/getNewBands', function (response) {
             $('#test, #test2').doubleSuggest('update', { 
