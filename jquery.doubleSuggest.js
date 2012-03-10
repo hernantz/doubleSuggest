@@ -209,7 +209,7 @@
 						$spot.addClass('active');
 						
 						// Call the custom onResultFocus function.
-						if ($spot.length > 0) { opts.onResultFocus.call(this, $spot.data()); }
+						if ($spot.length > 0) { opts.onResultFocus.call($input, $spot.data()); }
 
 						// Update the text with the currently selected item
 						// Display the text typed by the user if no result is selected
@@ -229,20 +229,20 @@
 						$(this).addClass('active');
 
 						// Call the custom onResultFocus function.
-						opts.onResultFocus.call(this, $(this).data());
+						opts.onResultFocus.call($input, $(this).data());
 					},
 					select: function(e) {
 
-						var data = $(this).data();
-						
+						var $elem = $(this);
+						var data = $elem.data();
 						typedText = data[opts.selectValue];
 						$input.val(typedText).focus();
 						
-						opts.onSelect.call(this, data);
+						opts.onSelect.call($input, data, $elem);
 
 						// Clear the input? and hide the results list.
 						// $input.val('').focus();
-						$resultsHolder.hide();					
+						$resultsHolder.hide();			
 					}
 				}, ".ds-result-item");
 				
@@ -295,8 +295,8 @@
 								}
 
 								// Call the formatList function and add the LI element to the results list.
-								var elem = opts.formatList ? opts.formatList.call(this, resultData, resultLI) : resultLI.html(resultData[opts.selectValue]);
-								$resultsUL.append(elem);
+								var $elem = opts.formatList ? opts.formatList.call($input, resultData, resultLI) : resultLI.html(resultData[opts.selectValue]);
+								$resultsUL.append($elem);
 
 								// Increment the results counter after each result is added to the results list.
 								matchCount++;
