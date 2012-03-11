@@ -1,9 +1,8 @@
-
 doubleSuggest
 
 Version: 0.1
 Author: hernantz 
-Url: http://hernantz.github.to/doubleSuggest
+Url: http://hernantz.github.com/doubleSuggest
 License: MIT - http://www.opensource.org/licenses/mit-license.php
 
 This jQuery plugin will set up a UI that suggest results as you type. 
