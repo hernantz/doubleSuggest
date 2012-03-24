@@ -253,10 +253,12 @@
 						props = opts.seekValue.split(','), // Get an array of the properties which the user wants to search with.
 						matchCount = 0,
 						i = 0,
-						queryWords = queryString.split(' ');
+						queryWords = queryString.split(' '); // Get an array of words the user typed
 
-					if (isLocal) {
-						// Clean and hide the results container.				  
+					// Clean and hide the results container, this is to remove older results and the loading message.
+					// Local results will appear faster and remove the loading message, but in case local results are disabled,
+					// the clean up show be done anyways.
+					if (isLocal || !opts.localSource) {
 						$resultsUL.html('');
 						$resultsHolder.hide();
 					} 
