@@ -252,7 +252,8 @@
 					var data = opts.retrieveComplete.call(this, data, queryString, isLocal), // This variable will hold the object from the source to be processed. 
 						props = opts.seekValue.split(','), // Get an array of the properties which the user wants to search with.
 						matchCount = 0,
-						i = 0;
+						i = 0,
+						queryWords = queryString.split(' ');
 
 					if (isLocal) {
 						// Clean and hide the results container.				  
@@ -274,8 +275,20 @@
 							// If not required, ignore the case sensitive search.
 							if (!opts.matchCase) { str = str.toLowerCase(); queryString = queryString.toLowerCase(); }
 							
-							// If the search returned at least one result, and that result is not already selected.
-							if (str.search(queryString) !== -1) {
+							var matched = false;
+
+							// If the query matches any word from the source that result is suggested
+                            for (var w in queryWords) {
+                                if (queryWords.hasOwnProperty(w)) {
+                                    if(str.search(queryWords[w]) !== -1){
+                                        matched = true;
+                                    }
+                                }
+
+                            }
+
+							// If the search returned at least one result.
+							if (matched == true) {
 							  
 							  	// Set a flag for each data source, and also attach the element's position
 								data[i]['_dataSource'] = isLocal ? 'local' : 'remote';
@@ -285,14 +298,20 @@
 								var resultLI = $('<li class="ds-result-item" id="ds-result-item-'+i+'"></li>').data(data[i]);
 								var resultData = $.extend({}, data[i]);
 
-								// Make the suggestions case sensitive or not. 
-								var cType = !opts.matchCase ? 'gi' : 'g';
-								var regx = new RegExp('(?![^&;]+;)(?!<[^<>]*)(' + queryString + ')(?![^<>]*>)(?![^&;]+;)', ''+ cType + '');
-								
-								// Highlight the results if the option is set to true.
-								if (opts.resultsHighlight) {
-									resultData[opts.selectValue] = resultData[opts.selectValue].replace(regx,"<em>$1</em>");
-								}
+								// Highlight matched words
+								for (var w in queryWords) {
+	                                if (queryWords.hasOwnProperty(w)) {
+
+										// Make the suggestions case sensitive or not. 
+										var cType = !opts.matchCase ? 'gi' : 'g';
+										var regx = new RegExp('(?![^&;]+;)(?!<[^<>]*)(' + queryWords[w] + ')(?![^<>]*>)(?![^&;]+;)', ''+ cType + '');
+										
+										// Highlight the results if the option is set to true.
+										if (opts.resultsHighlight) {
+											resultData[opts.selectValue] = resultData[opts.selectValue].replace(regx,"<em>$1</em>");
+										}
+	                                }
+	                            }
 
 								// Call the formatList function and add the LI element to the results list.
 								var $elem = opts.formatList ? opts.formatList.call($input, resultData, resultLI) : resultLI.html(resultData[opts.selectValue]);
