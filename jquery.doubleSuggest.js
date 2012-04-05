@@ -123,10 +123,8 @@
 
 						// If the user is no longer manipulating the results list, hide it.
 						if (!($resultsHolder.is(':hover'))){
-							$('li.as-selection-item', $dsContainer).addClass('blur').removeClass('selected');
 							$resultsHolder.hide();
 						}
-						
 					},
 					"updateOptions.doubleSuggest": function(e, newOptions) {
 						// Refresh the options.
