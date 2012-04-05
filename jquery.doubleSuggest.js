@@ -279,18 +279,22 @@
 							
 							var matched = false;
 
-							// If the query matches any word from the source that result is suggested
-                            for (var w in queryWords) {
-                                if (queryWords.hasOwnProperty(w)) {
-                                    if(str.search(queryWords[w]) !== -1){
-                                        matched = true;
-                                    }
-                                }
+							// Check if the query matches any word from the source that result is suggested
+							// but only the local ones, as the remote ones shoud be already matching something...
+	                        if (isLocal === true) {
+	                            for (var w in queryWords) {
+	                                if (queryWords.hasOwnProperty(w)) {
+	                                    if(str.search(queryWords[w]) !== -1){
+	                                        matched = true;
+	                                    }
+	                                }
 
+	                            }
                             }
 
-							// If the search returned at least one result.
-							if (matched == true) {
+							// If the search returned at least one result
+							// or we are processing a remote source of data.
+							if (matched === true || isLocal === false) {
 							  
 							  	// Set a flag for each data source, and also attach the element's position
 								data[i]['_dataSource'] = isLocal ? 'local' : 'remote';
@@ -300,19 +304,19 @@
 								var resultLI = $('<li class="ds-result-item" id="ds-result-item-'+i+'"></li>').data(data[i]);
 								var resultData = $.extend({}, data[i]);
 
-								// Highlight matched words
-								for (var w in queryWords) {
-	                                if (queryWords.hasOwnProperty(w)) {
+								// Highlight matched words if the option is set to true.
+								if (opts.resultsHighlight) {
+									for (var w in queryWords) {
+		                                if (queryWords.hasOwnProperty(w)) {
 
-										// Make the suggestions case sensitive or not. 
-										var cType = !opts.matchCase ? 'gi' : 'g';
-										var regx = new RegExp('(?![^&;]+;)(?!<[^<>]*)(' + queryWords[w] + ')(?![^<>]*>)(?![^&;]+;)', ''+ cType + '');
-										
-										// Highlight the results if the option is set to true.
-										if (opts.resultsHighlight) {
+											// Make the suggestions case sensitive or not. 
+											var cType = !opts.matchCase ? 'gi' : 'g';
+											var regx = new RegExp('(?![^&;]+;)(?!<[^<>]*)(' + queryWords[w] + ')(?![^<>]*>)(?![^&;]+;)', ''+ cType + '');
+											
+											// Highlight the results 
 											resultData[opts.selectValue] = resultData[opts.selectValue].replace(regx,"<em>$1</em>");
-										}
-	                                }
+		                                }
+		                            }
 	                            }
 
 								// Call the formatList function and add the LI element to the results list.
@@ -323,7 +327,7 @@
 								matchCount++;
 
 								// Check if we reached the limit of results to show.
-								if (opts.queryLimit && opts.queryLimit == matchCount ){ break; }
+								if (opts.queryLimit && opts.queryLimit === matchCount ){ break; }
 							}
 							
 							i++;
