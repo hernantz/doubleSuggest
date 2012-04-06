@@ -1,7 +1,7 @@
 /*
  * doubleSuggest
  *
- * @Version: 0.1
+ * @Version: 0.2
  * @Author: hernantz 
  * @Url: http://www.github.to/hernantz/doubleSuggest
  * @License: MIT - http://www.opensource.org/licenses/mit-license.php
@@ -249,8 +249,7 @@
 					var data = opts.retrieveComplete.call(this, data, queryString, isLocal), // This variable will hold the object from the source to be processed. 
 						props = opts.seekValue.split(','), // Get an array of the properties which the user wants to search with.
 						matchCount = 0,
-						i = 0,
-						queryWords = queryString.split(' '); // Get an array of words the user typed
+						i = 0;
 
 					// Clean and hide the results container, this is to remove older results and the loading message.
 					// Local results will appear faster and remove the loading message, but in case local results are disabled,
@@ -268,31 +267,30 @@
 							// Build a string for each element, by getting the data of all the properties in seekValue
 							str = '';
 							for (var y=0; y<props.length; y++) {
-								str = str + data[i][$.trim(props[y])];
+								str = str + (data[i][$.trim(props[y])] !== undefined ? data[i][$.trim(props[y])] : '');
 							}
 						
 							// If not required, ignore the case sensitive search.
-							if (!opts.matchCase) { str = str.toLowerCase(); queryString = queryString.toLowerCase(); }
+							if (!opts.matchCase) { 
+								str = str.toLowerCase(); 
+								queryString = queryString.toLowerCase(); 
+							}
+
+							// Get an array of words the user typed
+							queryWords = queryString.split(' ');
 							
+							// Check if the query matches any word from the source
 							var matched = false;
+							for (var w in queryWords) {
+								if (queryWords.hasOwnProperty(w)) {
+									if(str.search(queryWords[w]) !== -1){
+										matched = true;
+									}
+								}
+							}
 
-							// Check if the query matches any word from the source,
-							// but only the local ones, as the remote ones shoud be already matching something...
-	                        if (isLocal === true) {
-	                            for (var w in queryWords) {
-	                                if (queryWords.hasOwnProperty(w)) {
-	                                    if(str.search(queryWords[w]) !== -1){
-	                                        matched = true;
-	                                    }
-	                                }
-
-	                            }
-                            }
-
-							// If the search returned at least one result
-							// or we are processing a remote source of data.
-							if (matched === true || isLocal === false) {
-							  
+							// If the search returned at least one result.
+							if (matched === true) {
 							  	// Set a flag for each data source, and also attach the element's position
 								data[i]['_dataSource'] = isLocal ? 'local' : 'remote';
 								data[i]['_number'] = matchCount;
