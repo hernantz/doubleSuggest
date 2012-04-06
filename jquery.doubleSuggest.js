@@ -123,6 +123,7 @@
 
 						// If the user is no longer manipulating the results list, hide it.
 						if (!($resultsHolder.is(':hover'))){
+							$input.val(typedText);
 							$resultsHolder.hide();
 						}
 					},
@@ -234,12 +235,10 @@
 						var $elem = $(this);
 						var data = $elem.data();
 						typedText = data[opts.selectValue];
-						$input.val(typedText).focus();
+						$input.val(typedText);
 						
 						opts.onSelect.call($input, data, $elem);
-
-						// Clear the input? and hide the results list.
-						// $input.val('').focus();
+						$resultsUL.html('');
 						$resultsHolder.hide();			
 					}
 				}, ".ds-result-item");
@@ -277,7 +276,7 @@
 							
 							var matched = false;
 
-							// Check if the query matches any word from the source that result is suggested
+							// Check if the query matches any word from the source,
 							// but only the local ones, as the remote ones shoud be already matching something...
 	                        if (isLocal === true) {
 	                            for (var w in queryWords) {
