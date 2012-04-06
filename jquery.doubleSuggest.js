@@ -32,7 +32,14 @@
 				$input.wrap($dsContainer);
 				
 				// Div that holds each result or message inside the $resultsUL. 
-				var $resultsHolder = $('<div class="ds-results" id="ds-results-'+input_id+'"></div>').hide();
+				var $resultsHolder = $('<div class="ds-results" id="ds-results-'+input_id+'"></div>')
+					.hide()
+					.hover(function(){
+						$(this).data('hover', true);
+					},
+					function(){
+						$(this).data('hover', false);
+					});
 				$input.after($resultsHolder);
 				
 				// UL where all search results and messages are placed.
@@ -122,7 +129,7 @@
 					"blur.doubleSuggest": function(e) {
 
 						// If the user is no longer manipulating the results list, hide it.
-						if (!($resultsHolder.is(':hover'))){
+						if (!($resultsHolder.data('hover') == true)){
 							$input.val(typedText);
 							$resultsHolder.hide();
 						}
@@ -390,4 +397,4 @@
 		retrieveComplete: function(data, queryString, isLocal){ return data; }, // Custom function that is run before the current data object is processed.
 		resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
 	}
-})(jQuery);
+})(jQuery)
