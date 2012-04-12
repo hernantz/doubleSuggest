@@ -11,42 +11,42 @@
  * and also the results from an ajax search query. 
  * Requires jQuery > v.1.7
  */
- 
+
 ;(function($) {
 
 	var methods = {
 		init: function (options) {
-			
+
 			// Iterate over the current set of matched elements.
 			return this.each(function(index, element) {
-			
+
 				// Merge the options passed with the defaultOptions.
 				var opts = $.extend({}, $.fn.doubleSuggest.defaultOptions, options);
-			
+
 				// Grab the text input and it's id so we can call this plugin multiple times.
 				var $input = $(this).addClass('ds-input');
 				var	input_id = $input.attr('id');
-				
+
 				// Global container of the selected items.
 				var $dsContainer = $('<div class="ds-container" id="ds-container-'+input_id+'"></div>');
 				$input.wrap($dsContainer);
-				
+
 				// Div that holds each result or message inside the $resultsUL. 
 				var $resultsHolder = $('<div class="ds-results" id="ds-results-'+input_id+'"></div>').hide();
 				$input.after($resultsHolder);
-				
+
 				// UL where all search results and messages are placed.
 				var $resultsUL = $('<ul class="ds-list"></ul>').css('width', $input.outerWidth()).appendTo($resultsHolder);
 
 				// Used internally to know what text was typed by the user
 				var typedText = '';
-				
+
 				// Variable that will be holding the remaining time to process the input between each keyup event.
 				var timeout = null;
 
 				// Variable that holds the XMLHTTPRequest object. 
 				var jqxhr = null;
-				
+
 				// Handle input field events.
 				$input.on({
 					"focus.doubleSuggest": function(e) {
@@ -56,7 +56,7 @@
 					"keydown.doubleSuggest": function(e) {
 
 						// Track last key pressed.
-						lastKey = e.keyCode;
+						var lastKey = e.keyCode;
 						
 						switch(lastKey) {
 							
@@ -64,7 +64,7 @@
 							case 38: case 40:
 
 								e.preventDefault();
-								if (lastKey === 38) spotResult('up'); else spotResult('down');
+								if (lastKey === 38) { spotResult('up'); } else { spotResult('down'); }
 								break;
 
 							// Delete key pressed.
@@ -74,12 +74,12 @@
 								if ($input.val().length === 1){ $resultsHolder.hide(); }
 
 								// Make the search again, after the timeout delay.
-								refreshSearch(lastKey, timeout)
+								refreshSearch(lastKey, timeout);
 								break;
 
 							// Tab or comma keys pressed.
 							case 9: case 188: case 13:
-							
+
 								var nInput = $.trim($input.val()).replace(/(,)/g, '');
 								if (nInput !== '' && nInput.length >= opts.minChars) { 
 									
@@ -89,32 +89,32 @@
 										$('li.active:first', $resultsUL).trigger('select');
 										e.preventDefault();
 									} 
-									// else { // The tab or return keys where pressed when no results where found.
+									/*else { // The tab or return keys where pressed when no results where found.
 										
-									// 	// If adding new items is allowed.
-									// 	if (opts.newItem) {
+										// If adding new items is allowed.
+										if (opts.newItem) {
 
-									// 		// Get the custom formated object from the new item function.
-									// 		var nData = opts.newItem.call(this, nInput);
+											// Get the custom formated object from the new item function.
+											var nData = opts.newItem.call(this, nInput);
 
-									// 		// Hide the results list.
-									// 		$resultsHolder.hide();
+											// Hide the results list.
+											$resultsHolder.hide();
 
-									// 		// Reset the text input.
-									// 		$input.val('');
-									// 	}
-									// }
+											// Reset the text input.
+											$input.val('');
+										}
+									}*/
 								}	
 								break;
 
 							default:
-								
+
 								// Ignore if the following keys are pressed: [del] [shift] [capslock] [esc]
-								if ( lastKey == 46 || (lastKey > 9 && lastKey < 32) ) { 
+								if ( lastKey === 46 || (lastKey > 9 && lastKey < 32) ) { 
 									$resultsHolder.hide(); 
 								} else {
 									// Other key was pressed, call the keyChange event after the timeout delay.
-									refreshSearch(timeout)
+									refreshSearch(timeout);
 								}
 								break;
 						}
@@ -173,7 +173,7 @@
 							queryParam[opts.queryParam] = string;
 							jqxhr = $.getJSON(opts.remoteSource, $.extend({}, queryParam, opts.extraParams), function(response) { processData(response, string, false); });
 						}
-						
+
 						// If the local source is an object, retrieve the results directly from the source.
 						if(opts.localSource) {
 							processData(opts.localSource, string, true); 
@@ -184,15 +184,14 @@
 						//$input.removeClass('loading');
 						$resultsHolder.hide();
 					}
-
 				}
-				
+
 				// Function that handles the up & down key press events to select the results.
 				function spotResult(dir) {
 
 					// If there is at least one visible item in the results list.
 					if ($('li.ds-result-item:visible', $resultsHolder).length > 0) {
-					
+
 						// Get all the LI elements from the results list.
 						var $lis = $('li', $resultsHolder);
 
@@ -206,7 +205,7 @@
 						// Set the 'active' class to the current result item.
 						$lis.removeClass('active');
 						$spot.addClass('active');
-						
+
 						// Call the custom onResultFocus function.
 						if ($spot.length > 0) { opts.onResultFocus.call($input, $spot.data()); }
 
@@ -236,7 +235,7 @@
 						var data = $elem.data();
 						typedText = data[opts.selectValue];
 						$input.val(typedText);
-						
+
 						opts.onSelect.call($input, data, $elem);
 						$resultsUL.html('');
 						$resultsHolder.hide();			
@@ -245,7 +244,7 @@
 				
 				// Function that gets the matched results and displays them.
 				function processData (data, queryString, isLocal) {
-					
+
 					var data = opts.retrieveComplete.call(this, data, queryString, isLocal), // This variable will hold the object from the source to be processed. 
 						props = opts.seekValue.split(','), // Get an array of the properties which the user wants to search with.
 						matchCount = 0,
@@ -265,11 +264,11 @@
 						if (data.hasOwnProperty(k)) {
 
 							// Build a string for each element, by getting the data of all the properties in seekValue
-							str = '';
+							var str = '';
 							for (var y=0; y<props.length; y++) {
 								str = str + (data[i][$.trim(props[y])] !== undefined ? data[i][$.trim(props[y])] : '');
 							}
-						
+
 							// If not required, ignore the case sensitive search.
 							if (!opts.matchCase) { 
 								str = str.toLowerCase(); 
@@ -277,8 +276,8 @@
 							}
 
 							// Get an array of words the user typed
-							queryWords = queryString.split(' ');
-							
+							var queryWords = queryString.split(' ');
+
 							// Check if the query matches any word from the source
 							var matched = false;
 							for (var w in queryWords) {
@@ -291,10 +290,10 @@
 
 							// If the search returned at least one result.
 							if (matched === true) {
-							  	// Set a flag for each data source, and also attach the element's position
+								// Set a flag for each data source, and also attach the element's position
 								data[i]['_dataSource'] = isLocal ? 'local' : 'remote';
 								data[i]['_number'] = matchCount;
-								
+
 								// Build each result li element to show on the results list.
 								var resultLI = $('<li class="ds-result-item" id="ds-result-item-'+i+'"></li>').data(data[i]);
 								var resultData = $.extend({}, data[i]);
@@ -302,7 +301,7 @@
 								// Highlight matched words if the option is set to true.
 								if (opts.resultsHighlight) {
 									for (var w in queryWords) {
-		                                if (queryWords.hasOwnProperty(w)) {
+										if (queryWords.hasOwnProperty(w)) {
 
 											// Make the suggestions case sensitive or not. 
 											var cType = !opts.matchCase ? 'gi' : 'g';
@@ -310,9 +309,9 @@
 											
 											// Highlight the results 
 											resultData[opts.selectValue] = resultData[opts.selectValue].replace(regx,"<em>$1</em>");
-		                                }
-		                            }
-	                            }
+										}
+									}
+								}
 
 								// Call the formatList function and add the LI element to the results list.
 								var $elem = opts.formatList ? opts.formatList.call($input, resultData, resultLI) : resultLI.html(resultData[opts.selectValue]);
@@ -324,11 +323,11 @@
 								// Check if we reached the limit of results to show.
 								if (opts.queryLimit && opts.queryLimit === matchCount ){ break; }
 							}
-							
+
 							i++;
 						}
 					}
-		  
+
 					// There results where processed, remove the loading state
 					$input.removeClass('loading');
 				
@@ -355,17 +354,17 @@
 				$(this).trigger("destroy");
 			});
 		}
-	}
+	};
 
 	$.fn.doubleSuggest = function(args) {
 		if ( methods[args] ) {
-      		return methods[args].apply(this, Array.prototype.slice.call(arguments, 1));
-	    } else if (typeof args === 'object' || !args) {
-	      	return methods.init.apply(this, arguments);
-	    } else {
-	      	$.error('Invalid arguments ' + args + ' on jQuery.doubleSuggest');
-	    }
-	}
+			return methods[args].apply(this, Array.prototype.slice.call(arguments, 1));
+		} else if (typeof args === 'object' || !args) {
+			return methods.init.apply(this, arguments);
+		} else {
+			$.error('Invalid arguments ' + args + ' on jQuery.doubleSuggest');
+		}
+	};
 
 	// Make the defaultOptions globally accessable.
 	$.fn.doubleSuggest.defaultOptions = {
@@ -389,5 +388,5 @@
 		beforeRetrieve: function(string){ return string; }, // Custom function that is run before the AJAX request is made, or the local object is searched.
 		retrieveComplete: function(data, queryString, isLocal){ return data; }, // Custom function that is run before the current data object is processed.
 		resultsComplete: function(){} // Custom function that is run when the suggestion results dropdown list is made visible.
-	}
+	};
 })(jQuery);
