@@ -114,7 +114,7 @@
 									$resultsHolder.hide(); 
 								} else {
 									// Other key was pressed, call the keyChange event after the timeout delay.
-									refreshSearch(timeout);
+									refreshSearch();
 								}
 								break;
 						}
@@ -139,7 +139,7 @@
 				});
 
 				// Performs a new search by calling the keyChange function after the delay set.
-				function refreshSearch (timeout) {
+				function refreshSearch () {
 					if (timeout) { clearTimeout(timeout); }
 					timeout = setTimeout(function(){ keyChange(); }, opts.keyDelay);
 				}
