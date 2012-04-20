@@ -74,7 +74,7 @@
 								if ($input.val().length === 1){ $resultsHolder.hide(); }
 
 								// Make the search again, after the timeout delay.
-								refreshSearch(lastKey, timeout);
+								refreshSearch();
 								break;
 
 							// Tab or comma keys pressed.
