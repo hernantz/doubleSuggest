@@ -141,7 +141,7 @@
 				// Performs a new search by calling the keyChange function after the delay set.
 				function refreshSearch () {
 					if (timeout) { clearTimeout(timeout); }
-					timeout = setTimeout(function(){ keyChange(); }, opts.keyDelay);
+					timeout = setTimeout(keyChange, opts.keyDelay);
 				}
 
 				// Function that is executed when typing and after the key delay timeout.
