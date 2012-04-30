@@ -145,7 +145,10 @@
 
 				// Aborts the previous ajax request if it exists.
 				function clearAjaxRequest() {
-					if (jqxhr) { jqxhr.abort(); }
+					if (jqxhr) { console.log("aca dentro", jqxhr);
+						for (ajaxRequest in jqxhr) { jqxhr[ajaxRequest].abort(); }
+						jqxhr = null; 
+					}
 				}
 
 				// Performs a new search by calling the keyChange function after the delay set.
@@ -178,9 +181,13 @@
 						// If the data is a URL, build the query and retrieve the response in JSON format.
 						if (opts.remoteSource) {
 							clearAjaxRequest();
-							var queryParam = {};
-							queryParam[opts.queryParam] = string;
-							jqxhr = $.getJSON(opts.remoteSource, $.extend({}, queryParam, opts.extraParams), function(response) { processData(response, string, false); });
+							if(typeof opts.remoteSource === 'string') {opts.remoteSource = [opts.remoteSource]; }
+							jqxhr = [];
+							for (url in opts.remoteSource) {
+								var queryParam = {};
+								queryParam[opts.queryParam] = string;
+								jqxhr[url] = $.getJSON(opts.remoteSource[url], $.extend({}, queryParam, opts.extraParams), function(response) { processData(response, string, false); });
+							}
 						}
 
 						// If the local source is an object, retrieve the results directly from the source.
