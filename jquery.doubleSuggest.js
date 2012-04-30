@@ -77,18 +77,17 @@
 								refreshSearch();
 								break;
 
-							// Tab or comma keys pressed.
-							case 9: case 188: case 13:
+							// Tab or Enter keys pressed.
+							case 9: case 13:
 
-								var nInput = $.trim($input.val()).replace(/(,)/g, '');
+								var nInput = $.trim($input.val());
 								if (nInput !== '' && nInput.length >= opts.minChars) { 
 									
-									// If the tab or return keys are pressed when an result item is active, add it.
-									// Prevent default behaviour if the comma or return keys are pressed to avoid submiting the form which doubleSuggest is part of.
-									if ((lastKey === 9 || lastKey === 13) && $('li.ds-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) { 
+									// Prevent default behaviour if the Tab or Enter keys are pressed to avoid submiting the form which doubleSuggest is part of.
+									if ($('li.ds-result-item:visible', $resultsHolder).length > 0 && $('li.active:first', $resultsUL).length > 0) {
 										$('li.active:first', $resultsUL).trigger('select');
 										e.preventDefault();
-									} 
+									}
 									/*else { // The tab or return keys where pressed when no results where found.
 										
 										// If adding new items is allowed.
@@ -107,9 +106,15 @@
 								}	
 								break;
 
+							// Esc key pressed.
+							case 27:
+								clearAjaxRequest();
+								$resultsHolder.hide();
+								break;
+
 							default:
 
-								// Ignore if the following keys are pressed: [del] [shift] [capslock] [esc]
+								// Ignore if the following keys are pressed: [shift] [capslock]
 								if ( lastKey === 46 || (lastKey > 9 && lastKey < 32) ) { 
 									$resultsHolder.hide(); 
 								} else {
@@ -138,8 +143,13 @@
 					}
 				});
 
+				// Aborts the previous ajax request if it exists.
+				function clearAjaxRequest() {
+					if (jqxhr) { jqxhr.abort(); }
+				}
+
 				// Performs a new search by calling the keyChange function after the delay set.
-				function refreshSearch () {
+				function refreshSearch() {
 					if (timeout) { clearTimeout(timeout); }
 					timeout = setTimeout(keyChange, opts.keyDelay);
 				}
@@ -162,13 +172,12 @@
 
 						// Show the loading text, and start the loading state.
 						$input.addClass('loading');
-						// FIXME - remove show()? not firing on ajax request
 						if(opts.loadingText) { $resultsUL.html('<li class="ds-message">'+opts.loadingText+'</li>').show(); } 
 						$resultsHolder.show();
 
 						// If the data is a URL, build the query and retrieve the response in JSON format.
 						if (opts.remoteSource) {
-							if (jqxhr) { jqxhr.abort(); }
+							clearAjaxRequest();
 							var queryParam = {};
 							queryParam[opts.queryParam] = string;
 							jqxhr = $.getJSON(opts.remoteSource, $.extend({}, queryParam, opts.extraParams), function(response) { processData(response, string, false); });
