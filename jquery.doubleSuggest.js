@@ -39,7 +39,7 @@
 				var $resultsUL = $('<ul class="ds-list"></ul>').css('width', $input.outerWidth()).appendTo($resultsHolder);
 
 				// Used internally to know what text was typed by the user
-				var typedText = '';
+				var typedText = $.trim($input.val());
 
 				// Variable that will be holding the remaining time to process the input between each keyup event.
 				var timeout = null;
