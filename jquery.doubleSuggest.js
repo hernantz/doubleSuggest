@@ -1,7 +1,7 @@
 /*
  * doubleSuggest
  *
- * @Version: 0.2
+ * @Version: 0.3
  * @Author: hernantz 
  * @Url: http://www.github.to/hernantz/doubleSuggest
  * @License: MIT - http://www.opensource.org/licenses/mit-license.php
