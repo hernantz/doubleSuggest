@@ -178,6 +178,22 @@
       
       <br>
       
+      <h2>Set a new value to the input</h2>
+      If you want to set an initial value just use the input's value attribute and doubleSuggest will automatically pick it up for you.
+      <pre class="brush: html;">
+        <input type="text" id="search" autocomplete="off" value="My value" />
+      </pre>
+
+      If later in your custom js script you need to programatically set a new value to a doubleSuggest input, try <i>setValue</i>.
+      <br /> 
+      <b>Note: this will not fire a new search request</b>, it will just update the typed-text state variable that doubleSuggest uses internally. 
+
+      <pre class="brush: js;">
+        $('#search').doubleSuggest('setValue', 'My new value');
+      </pre>
+
+      <br>
+      
       <h2>Update and destroy</h2>
       It is sometimes useful to update some settings programatically. Use the update param to modify any of the doubleSuggest's options at runtime.
       <pre class="brush: js;">
