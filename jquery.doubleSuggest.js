@@ -133,6 +133,12 @@
 							$resultsHolder.hide();
 						}
 					},
+					"setValue.doubleSuggest": function(e, newValue) {
+                        // Used to programatically update the input's value,
+                        // when interacting with other js scripts.
+                        currentValue = newValue;
+                        $input.val(newValue);
+                    },
 					"updateOptions.doubleSuggest": function(e, newOptions) {
 						// Refresh the options.
 						// FIXME - Is this place the correct one to bind this option?
@@ -353,7 +359,12 @@
 					opts.resultsComplete.call(this);
 				}
 			});
-		}, 
+		},
+		setValue: function(value) {
+			return this.each(function(index, element) {
+				$(this).trigger("setValue", value);
+			});
+		},
 		update: function(options) {
 			return this.each(function(index, element) {
 				$(this).trigger("updateOptions", options);
