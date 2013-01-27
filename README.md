@@ -1,11 +1,11 @@
 doubleSuggest
 =============
 
-    **Version**: 0.3
+**Version**: 0.3
 
-    **Url**: http://hernantz.github.com/doubleSuggest
+**Url**: http://hernantz.github.com/doubleSuggest
 
-    **License**: MIT - http://www.opensource.org/licenses/mit-license.php
+**License**: MIT - http://www.opensource.org/licenses/mit-license.php
 
     This jQuery plugin will set up a UI that suggest results as you type. 
     It will display two types of suggestions, first (and faster) the local data 
