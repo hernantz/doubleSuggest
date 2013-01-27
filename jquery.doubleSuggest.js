@@ -39,7 +39,7 @@
 				var $resultsUL = $('<ul class="ds-list"></ul>').css('width', $input.outerWidth()).appendTo($resultsHolder);
 
 				// Used internally to know what text was typed by the user
-				var typedText = $.trim($input.val());
+				var currentValue = $.trim($input.val());
 
 				// Variable that will be holding the remaining time to process the input between each keyup event.
 				var timeout = null;
@@ -129,7 +129,7 @@
 
 						// If the user is no longer manipulating the results list, hide it.
 						if (!($resultsHolder.is(':hover'))){
-							$input.val(typedText);
+							$input.val(currentValue);
 							$resultsHolder.hide();
 						}
 					},
@@ -163,7 +163,7 @@
 					var string = $.trim($input.val()).replace(/[\\]+|[\/]+/g,"").replace(/\s+/g," ");
 
 					// Save the string to know what was typed by the user.
-					typedText = string;
+					currentValue = string;
 
 					// If we passed the min chars limit, proceed.
 					if (string.length >= opts.minChars) {
@@ -221,7 +221,7 @@
 
 						// Update the text with the currently selected item
 						// Display the text typed by the user if no result is selected
-						var newText = $spot.length > 0 ? $spot.data()[opts.selectValue] : typedText;
+						var newText = $spot.length > 0 ? $spot.data()[opts.selectValue] : currentValue;
 						$input.val(newText);
 					}
 				}
@@ -243,8 +243,8 @@
 
 						var $elem = $(this);
 						var data = $elem.data();
-						typedText = data[opts.selectValue];
-						$input.val(typedText);
+						currentValue = data[opts.selectValue];
+						$input.val(currentValue);
 
 						opts.onSelect.call($input, data, $elem);
 						$resultsUL.html('');
