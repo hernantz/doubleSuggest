@@ -88,6 +88,7 @@
 										$('li.active:first', $resultsUL).trigger('select');
 										e.preventDefault();
 									}
+                                    // FIXME: implement this feature? 
 									/*else { // The tab or return keys where pressed when no results where found.
 										
 										// If adding new items is allowed.
