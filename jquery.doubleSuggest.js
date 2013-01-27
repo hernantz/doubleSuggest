@@ -133,6 +133,10 @@
 							$resultsHolder.hide();
 						}
 					},
+					"refresh.doubleSuggest": function(e, newValue) {
+                        // Used to programatically performs a new search.
+                        refreshSearch();
+                    },
 					"setValue.doubleSuggest": function(e, newValue) {
                         // Used to programatically update the input's value,
                         // when interacting with other js scripts.
@@ -141,7 +145,6 @@
                     },
 					"updateOptions.doubleSuggest": function(e, newOptions) {
 						// Refresh the options.
-						// FIXME - Is this place the correct one to bind this option?
 						opts = $.extend($.fn.doubleSuggest.defaultOptions, options, newOptions);
 					}, 
 					"destroy.doubleSuggest": function(e) {
@@ -358,6 +361,11 @@
 					// Call the custom resultsComplete function.
 					opts.resultsComplete.call(this);
 				}
+			});
+		},
+		refresh: function() {
+			return this.each(function(index, element) {
+				$(this).trigger("refresh");
 			});
 		},
 		setValue: function(value) {
